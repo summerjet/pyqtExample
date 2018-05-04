@@ -1,0 +1,18 @@
+<RCC>
+  <qresource prefix="icon">
+    <file>pic/fresh.png</file>
+    <file>pic/TopSight.png</file>
+    <file>pic/rotate.png</file>
+    <file>pic/RightSight.png</file>
+    <file>pic/output.png</file>
+    <file>pic/off.png</file>
+    <file>pic/move.png</file>
+    <file>pic/import.png</file>
+    <file>pic/FrontSight.png</file>
+    <file>pic/fresh.png</file>
+    <file>pic/file-open.png</file>
+    <file>pic/clear.png</file>
+    <file>pic/background.png</file>
+    <file>pic/add.png</file>
+  </qresource>
+</RCC>
