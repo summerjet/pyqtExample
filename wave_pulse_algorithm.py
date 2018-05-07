@@ -8,7 +8,7 @@ import Queue
 
 
 myq = Queue.Queue(maxsize = 5200+1)
-
+threading_out = 0
 
 port = 8081
 s = socket.socket(socket.AF_INET,socket.SOCK_DGRAM)   
@@ -41,8 +41,10 @@ def socket_putin():
                         index+=1
 
                     while myq.full() == 1:
-                        print "queue full size = ",myq.qsize(), "qsize is full ! \n\n"
+                        #print "queue full size = ",myq.qsize(), "qsize is full ! \n\n"
                         time.sleep(1)
+                        #if threading_out:
+                            #exit()
                         #put_flag=0
                         #breakout=0
                         #s.close()
@@ -141,7 +143,7 @@ class distannce_parse():
                                                            
                             for z1 in range(320):
                                 for z2 in range(8):
-                                    self.data_channel_all.append(data_temp[z1*32+int(channel)*8+z2])
+                                    self.data_channel_all.append(data_temp[z1*32+channel*8+z2])
                                     self.data_channel0.append(data_temp[z1*32+0*8+z2])
                                     self.data_channel1.append(data_temp[z1*32+1*8+z2])
                                     self.data_channel2.append(data_temp[z1*32+2*8+z2])
@@ -149,7 +151,6 @@ class distannce_parse():
                             
                             #print "oneframe_data completed ==============================================="
                             data_temp =[]
-                            self.data_channel_all=[]
                             break
                             
                         else:
@@ -175,7 +176,7 @@ class distannce_parse():
             data_get=[]
                
         #print self.data_channel_all
-        #plt.plot(self.data_channel2[0:500],'r.--')  
+        #plt.plot(self.data_channel_all[0:500],'r.--')  
         #plt.show()  
         return self.data_channel_all
 
@@ -203,7 +204,7 @@ class distannce_parse():
         return self.pulseData, self.ptIndex
     
     def widthGet(self):
-        threshold = 85+75
+        threshold = 85+65
         y =[arr for arr in self.pulseData]
         x =[arr for arr in self.ptIndex]
 
@@ -218,11 +219,11 @@ class distannce_parse():
         #print "max(y)=", max(y)
         max_index = y.index(max(y))
         for dis in range(len(y)) :
-            if y[dis] >=threshold and x[dis] <= x[max_index]+30:
+            if y[dis] >=threshold and x[dis] <= x[max_index]+40:
                 Id.append(dis)
         #print "index =",Id
         
-        if len(Id)>1 and not(x[Id[0]]==x[0]) and not(y[Id[0]]==y[0]) :  
+        if len(Id)>=1 and not(x[Id[0]]==x[0]) and not(y[Id[0]]==y[0]) :  
             #print "len id =", len(Id), " ", Id[0]," ",x[Id[0]]," ", x[0], "x=", x," y=",y
             #Id.insert(0,Id[0]-1)
             Id.insert(0,Id[0]-1)
@@ -273,9 +274,9 @@ class distannce_parse():
             print 'peak < width-threshold'
     
 
-        #plt.plot(x,y,'*--')
-        #plt.plot([width_left,width_right],[threshold,threshold],'ro--')
-        #plt.show()
+        plt.plot(x[0:200],y[0:200],'*--')
+        plt.plot([width_left,width_right],[threshold,threshold],'ro--')
+        plt.show()
         
         distance = []
         width =round(width_right-width_left,4)
@@ -317,9 +318,9 @@ if __name__ == '__main__':
 
     try:
         datahandle = distannce_parse()
-        for i in range(100 ):
+        for i in range(1):
             time.sleep(0.01)
-            pSignal=datahandle.wave_data_catch(0)
+            pSignal=datahandle.wave_data_catch(channel_opt)
             datahandle.pulseSignal()
             w_d = datahandle.widthGet()
             if w_d[0]:
@@ -333,7 +334,7 @@ if __name__ == '__main__':
 
     except:
         print "creating treading failed !!!"
-        
+    
     #print "threding is over !"
     try:
         print "congratulation to you !"
@@ -341,12 +342,16 @@ if __name__ == '__main__':
         print width_list, "len(width_list) =", len(width_list)
         print distance_list, "len(distance_list) =", len(distance_list)
         print "width std =", np.std(width_list)," distance std =", np.std(distance_list)
-        plt.plot(distance_list,width_list,'bo')
-        plt.xlabel(" posedge_of_pulse /ns")
-        plt.ylabel(" width_of_pulse /bit")
-        plt.title("divergence_of_signal")
-        plt.show()
+        #plt.plot(distance_list,width_list,'bo')
+        #plt.xlabel(" posedge_of_pulse /ns")
+        #plt.ylabel(" width_of_pulse /bit")
+        #plt.title("divergence_of_signal")
+        #plt.show()
 
     except:
         print 'widthGetting error!!'
 
+    #ret1.stop()
+    #ret1.join()
+    #threading_out=1
+    

@@ -4,7 +4,6 @@ import matplotlib.pyplot as plt
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg
 import matplotlib.animation as animation
 
-
 from ui_mainwindow import Ui_MainWindow
 #from wave_pulse_algorithm import distannce_parse, wave_receive_thread
 import time
@@ -12,14 +11,13 @@ import csv
 import random
 import numpy
 
-channel_opt = 2
-
 app = QApplication(sys.argv)
 window = QMainWindow()
 ui = Ui_MainWindow()
 ui.setupUi(window)
 '''
 ######################width##############################
+channel_opt = 2
 ret1 = wave_receive_thread()
 ret1.start()
 width_list =[]
@@ -29,7 +27,7 @@ try:
 	widthhandle = distannce_parse()
 	for i in range(1 ):
 	    time.sleep(0.01)
-	    pSignal=widthhandle.wave_width_catch(0)
+	    pSignal=widthhandle.wave_data_catch(0)
 	    widthhandle.pulseSignal()
 	    w_d = widthhandle.widthGet()
 	    if w_d[0]:
