@@ -281,7 +281,7 @@ class distannce_parse():
         distance = []
         width =round(width_right-width_left,4)
         distance = round(width_left,4)
-        print "width = ", width, "  distance = ",distance    
+        #print "width = ", width, "  distance = ",distance    
 
         return width,distance
 
