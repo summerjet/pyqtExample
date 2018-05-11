@@ -6,9 +6,10 @@
 #
 # WARNING! All changes made in this file will be lost!
 import qrc_rc
+from reportlab.pdfgen import canvas
+from reportlab.lib.utils import ImageReader
 #from wave_pulse_algorithm import distannce_parse, wave_receive_thread
 from udpRowData import distannce_parse, wave_receive_thread
-
 import time
 import random
 import numpy
@@ -22,11 +23,11 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(1800, 1100)
+        MainWindow.resize(1800, 1080)
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
         self.pyplotWidget = QtWidgets.QWidget(self.centralwidget)
-        self.pyplotWidget.setGeometry(QtCore.QRect(550, 20, 1300, 1100))
+        self.pyplotWidget.setGeometry(QtCore.QRect(550, 20, 1311, 1121))
         self.pyplotWidget.setObjectName("pyplotWidget")
         self.layoutWidget = QtWidgets.QWidget(self.centralwidget)
         self.layoutWidget.setGeometry(QtCore.QRect(8, 10, 464, 791))
@@ -489,7 +490,7 @@ class Ui_MainWindow(object):
         self.channel7.setObjectName("channel7")
         self.gridLayout.addWidget(self.channel7, 4, 2, 1, 1)
         self.rmse_message = QtWidgets.QTextBrowser(self.centralwidget)
-        self.rmse_message.setGeometry(QtCore.QRect(91, 887, 160, 40))
+        self.rmse_message.setGeometry(QtCore.QRect(91, 879, 160, 40))
         font = QtGui.QFont()
         font.setPointSize(16)
         font.setBold(False)
@@ -497,7 +498,7 @@ class Ui_MainWindow(object):
         self.rmse_message.setFont(font)
         self.rmse_message.setObjectName("rmse_message")
         self.label = QtWidgets.QLabel(self.centralwidget)
-        self.label.setGeometry(QtCore.QRect(141, 924, 48, 23))
+        self.label.setGeometry(QtCore.QRect(141, 916, 48, 23))
         font = QtGui.QFont()
         font.setPointSize(15)
         font.setBold(True)
@@ -506,10 +507,10 @@ class Ui_MainWindow(object):
         self.label.setFont(font)
         self.label.setObjectName("label")
         self.average_message = QtWidgets.QTextBrowser(self.centralwidget)
-        self.average_message.setGeometry(QtCore.QRect(261, 887, 160, 40))
+        self.average_message.setGeometry(QtCore.QRect(261, 879, 160, 40))
         self.average_message.setObjectName("average_message")
         self.label_2 = QtWidgets.QLabel(self.centralwidget)
-        self.label_2.setGeometry(QtCore.QRect(311, 924, 78, 23))
+        self.label_2.setGeometry(QtCore.QRect(311, 916, 78, 23))
         font = QtGui.QFont()
         font.setPointSize(15)
         font.setBold(True)
@@ -518,10 +519,10 @@ class Ui_MainWindow(object):
         self.label_2.setFont(font)
         self.label_2.setObjectName("label_2")
         self.lcdNumber = QtWidgets.QLCDNumber(self.centralwidget)
-        self.lcdNumber.setGeometry(QtCore.QRect(90, 950, 331, 61))
+        self.lcdNumber.setGeometry(QtCore.QRect(90, 942, 331, 61))
         self.lcdNumber.setObjectName("lcdNumber")
         self.label_3 = QtWidgets.QLabel(self.centralwidget)
-        self.label_3.setGeometry(QtCore.QRect(170, 1021, 181, 21))
+        self.label_3.setGeometry(QtCore.QRect(170, 1013, 181, 21))
         font = QtGui.QFont()
         font.setPointSize(15)
         font.setBold(True)
@@ -530,10 +531,10 @@ class Ui_MainWindow(object):
         self.label_3.setFont(font)
         self.label_3.setObjectName("label_3")
         self.realDistance = QtWidgets.QTextEdit(self.centralwidget)
-        self.realDistance.setGeometry(QtCore.QRect(91, 812, 160, 40))
+        self.realDistance.setGeometry(QtCore.QRect(91, 804, 160, 40))
         self.realDistance.setObjectName("realDistance")
         self.label_4 = QtWidgets.QLabel(self.centralwidget)
-        self.label_4.setGeometry(QtCore.QRect(110, 852, 128, 23))
+        self.label_4.setGeometry(QtCore.QRect(110, 844, 128, 23))
         font = QtGui.QFont()
         font.setPointSize(15)
         font.setBold(True)
@@ -651,6 +652,7 @@ class Ui_MainWindow(object):
 #########################################edit by summerjet#################################
         #initial clear all
     def initialAll(self,pDistance):
+        self.rpt = canvas.Canvas("./dataTemp/calibration_report.pdf")
         self.pDistance=0
         self.DWScale = 0
         self.scale_distance = 200.0
@@ -1151,6 +1153,7 @@ class Ui_MainWindow(object):
             writer = csv.writer(csvfile)
             writer.writerows(data_read)
         print "write successful!"
+        self.reportGen()
     def csv_save_udp_sum(self):
         data_read = []
         with open ("./dataTemp/originUdpSumData.csv","rb") as f1:
@@ -1196,6 +1199,14 @@ class Ui_MainWindow(object):
         self.average_message.setText("%f"%round(distance_mean,4))
         self.lcdNumber.display(len(self.width_show))
         return width_mean
+    def reportGen(self):
+	######report generating
+        self.Fig1.savefig('./dataTemp/Fig1.png')
+        img = ImageReader('./dataTemp/Fig1.png')
+        self.rpt.drawImage(img,200,200, width=300, height=200)
+        self.rpt.showPage()
+        self.rpt.save()
+	########################
 
 ###########################################################################################
     def retranslateUi(self, MainWindow):

@@ -6,9 +6,10 @@
 #
 # WARNING! All changes made in this file will be lost!
 import qrc_rc
+from reportlab.pdfgen import canvas
+from reportlab.lib.utils import ImageReader
 #from wave_pulse_algorithm import distannce_parse, wave_receive_thread
 from udpRowData import distannce_parse, wave_receive_thread
-
 import time
 import random
 import numpy
@@ -26,7 +27,7 @@ class Ui_MainWindow(object):
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
         self.pyplotWidget = QtWidgets.QWidget(self.centralwidget)
-        self.pyplotWidget.setGeometry(QtCore.QRect(550, 20, 1311, 1121))
+        self.pyplotWidget.setGeometry(QtCore.QRect(550, 20, 1300, 1000))
         self.pyplotWidget.setObjectName("pyplotWidget")
         self.layoutWidget = QtWidgets.QWidget(self.centralwidget)
         self.layoutWidget.setGeometry(QtCore.QRect(8, 10, 464, 791))
@@ -372,19 +373,19 @@ class Ui_MainWindow(object):
         self.clearAndClose.setIconSize(QtCore.QSize(30, 30))
         self.clearAndClose.setObjectName("clearAndClose")
         self.gridLayout.addWidget(self.clearAndClose, 6, 1, 1, 1)
-        self.change_calibration = QtWidgets.QPushButton(self.layoutWidget)
+        self.reportGenerating = QtWidgets.QPushButton(self.layoutWidget)
         font = QtGui.QFont()
         font.setPointSize(11)
         font.setBold(True)
         font.setWeight(75)
-        self.change_calibration.setFont(font)
-        self.change_calibration.setLayoutDirection(QtCore.Qt.LeftToRight)
+        self.reportGenerating.setFont(font)
+        self.reportGenerating.setLayoutDirection(QtCore.Qt.LeftToRight)
         icon5 = QtGui.QIcon()
         icon5.addPixmap(QtGui.QPixmap(":/icon/pic/import.png"), QtGui.QIcon.Selected, QtGui.QIcon.On)
-        self.change_calibration.setIcon(icon5)
-        self.change_calibration.setIconSize(QtCore.QSize(30, 30))
-        self.change_calibration.setObjectName("change_calibration")
-        self.gridLayout.addWidget(self.change_calibration, 5, 2, 1, 1)
+        self.reportGenerating.setIcon(icon5)
+        self.reportGenerating.setIconSize(QtCore.QSize(30, 30))
+        self.reportGenerating.setObjectName("reportGenerating")
+        self.gridLayout.addWidget(self.reportGenerating, 5, 2, 1, 1)
         self.channel5 = QtWidgets.QCheckBox(self.layoutWidget)
         font = QtGui.QFont()
         font.setPointSize(15)
@@ -619,8 +620,8 @@ class Ui_MainWindow(object):
         MainWindow.setTabOrder(self.channel5, self.channel6)
         MainWindow.setTabOrder(self.channel6, self.channel7)
         MainWindow.setTabOrder(self.channel7, self.catchWave)
-        MainWindow.setTabOrder(self.catchWave, self.change_calibration)
-        MainWindow.setTabOrder(self.change_calibration, self.clearAndClose)
+        MainWindow.setTabOrder(self.catchWave, self.reportGenerating)
+        MainWindow.setTabOrder(self.reportGenerating, self.clearAndClose)
         MainWindow.setTabOrder(self.clearAndClose, self.saveOriginUdpData)
         MainWindow.setTabOrder(self.saveOriginUdpData, self.change_calibration_2)
         MainWindow.setTabOrder(self.change_calibration_2, self.change_calibration_3)
@@ -651,12 +652,14 @@ class Ui_MainWindow(object):
 #########################################edit by summerjet#################################
         #initial clear all
     def initialAll(self,pDistance):
+        self.rpt = canvas.Canvas("./dataTemp/calibration_report.pdf")
         self.pDistance=0
         self.DWScale = 0
         self.scale_distance = 200.0
         self.scale_width = 200.0
         self.distance_real = 8.5
         self.pDistance = pDistance
+        self.channel_opt = 0
         self.width_udp, self.distance_udp, self.width, self.distance_delta, self.cal_width, self.cal_distance, self.width_show, self.distance_show = [],[],[],[],[],[],[],[]
         self.cal_width = [0,0,0,0,0,0,0,0,0,0]
         self.cal_distance = [0,0,0,0,0,0,0,0,0,0]
@@ -669,8 +672,8 @@ class Ui_MainWindow(object):
         
         
         #set up slots and signals
-        self.catchWave.clicked.connect(self.width_distance_udp_sum)
-        self.change_calibration.clicked.connect(self.width_distance_calculate)
+        self.catchWave.clicked.connect(self.width_distance_calculate)
+        self.reportGenerating.clicked.connect(self.rptGenerating)
         self.clearAndClose.clicked.connect(self.clearAndCloseFunc)
         self.saveOriginUdpData.clicked.connect(self.csv_save_udp_sum)
         self.calibration_out.clicked.connect(self.calibration_csv_write)
@@ -766,8 +769,10 @@ class Ui_MainWindow(object):
         step = 10
         step_value = (width_max - width_min)/step
 
-        for r in range(step):
-            self.cal_width_set_init.append(r*step_value+0.5*step_value+width_min)
+        # for r in range(step):
+        #     self.cal_width_set_init.append(r*step_value+0.5*step_value+width_min)
+        cof = [0.3, 0.8, 1.3, 2, 3, 4.5, 5.5, 6.5, 8, 9.5]
+        self.cal_width_set_init=[step_value*arr+width_min for arr in cof]
         for k in range(step):
             dis_av_pt = []
             for m in range(len(self.width)):
@@ -988,7 +993,7 @@ class Ui_MainWindow(object):
         return width_list, distance_list
     '''
     def udpRowData_width_distance_catch_func(self):
-        points_num=100
+        points_num=300
         self.channel_opt = 0
         channel_sel = self.wave_channel_sel()
         
@@ -1019,14 +1024,16 @@ class Ui_MainWindow(object):
         step_value = (width_max - width_min)/step
 
         cal_distance = []
-        cal_width=[]
-        for r in range(step):
-            cal_width.append(r*step_value+0.2*step_value+width_min)
+        # cal_width=[]
+        # for r in range(step):
+        #     cal_width.append(r*step_value+0.2*step_value+width_min)
+        cof = [0.3, 0.8, 1.3, 2, 3, 4.5, 5.5, 6.5, 8, 9.5]
+        cal_width=[step_value*arr+width_min for arr in cof]
+
         for k in range(step):
             dis_av_pt = []
             for m in range(len(width)):
-                #if width[m]>=(k+0.5)*step_value-step_value*0.2 and width[m]<=(k+0.5)*step_value+step_value*0.2:
-                if width[m]>=(k+0.5)*step_value-step_value*0.2 and width[m]<=(k+0.5)*step_value+step_value*0.2:
+                if width[m]>=cal_width[k]-step_value*0.2 and width[m]<=cal_width[k]+step_value*0.2:
                     dis_av_pt.append(distance_delta[m])
             if dis_av_pt:
                 cal_distance.append(numpy.mean(dis_av_pt))
@@ -1035,7 +1042,7 @@ class Ui_MainWindow(object):
         #print "len of calwidth =", len(cal_width)," step_value =", step_value,"len(cal_dis) =", len(cal_distance)
         
         self.width,self.distance_delta,self.cal_width,self.cal_distance = width,distance_delta,cal_width,cal_distance
-        #self.cal_width_set_init , self.cal_distance_set_init= cal_width, cal_distance
+        # self.cal_width_set_init , self.cal_distance_set_init= cal_width, cal_distance
         self.cal_width_set_1 , self.cal_distance_set_1= cal_width, cal_distance
         self.botton_value_set()
         print self.width[0:50],"\n\n",self.distance_delta[0:50]#,"\n\n",self.cal_width,"\n\n",self.cal_distance,"\n\n",self.width_show,"\n\n",self.distance_show,"\n","\n",
@@ -1063,11 +1070,13 @@ class Ui_MainWindow(object):
         width_min = min(self.width)
         step = 10
         step_value = (width_max - width_min)/step
-        
+        # print self.width
         self.cal_distance = []
-        self.cal_width=[]
-        for r in range(step):
-            self.cal_width.append(r*step_value+0.5*step_value)
+        # self.cal_width=[]
+        # for r in range(step):
+        #     self.cal_width.append(r*step_value+0.5*step_value)
+        cof = [0.3, 0.8, 1.3, 2, 3, 4.5, 5.5, 6.5, 8, 9.5]
+        self.cal_width=[step_value*arr+width_min for arr in cof]
         for k in range(step):
             dis_av_pt = []
             for m in range(len(self.width)):
@@ -1086,6 +1095,7 @@ class Ui_MainWindow(object):
 
         x=self.cal_width
         y=self.cal_distance
+        # print "x = ", x, "\n y =", y
         for h in range(len(self.width_show)):
             if self.width_show[h] < self.cal_width[0]:
                 distance_show_temp = float((y[1]-y[0])*(self.width_show[h]-x[0]))/float(x[1]-x[0])+float(y[0])
@@ -1151,6 +1161,7 @@ class Ui_MainWindow(object):
             writer = csv.writer(csvfile)
             writer.writerows(data_read)
         print "write successful!"
+        self.reportGen()
     def csv_save_udp_sum(self):
         data_read = []
         with open ("./dataTemp/originUdpSumData.csv","rb") as f1:
@@ -1196,6 +1207,22 @@ class Ui_MainWindow(object):
         self.average_message.setText("%f"%round(distance_mean,4))
         self.lcdNumber.display(len(self.width_show))
         return width_mean
+    def rptGenerating(self):
+        self.rpt.save()
+        self.rpt = canvas.Canvas("./dataTemp/calibration_report.pdf")
+    def reportGen(self):
+	######report generating
+        self.Fig1.savefig('./dataTemp/Fig1.png')
+        img = ImageReader('./dataTemp/Fig1.png')
+        self.rpt.drawImage(img, 50, 430,width=500,height=400)
+        self.rpt.drawString(270,800,'channel%s'%self.channel_opt)
+        self.rpt.drawString(26,700,'distance /m')
+        self.rpt.drawString(26,530,'distance /m')
+        self.rpt.drawString(270,620,'width /m')
+        self.rpt.drawString(270,450,'width /m')
+        self.rpt.showPage()
+	########################
+
 
 ###########################################################################################
     def retranslateUi(self, MainWindow):
@@ -1216,11 +1243,11 @@ class Ui_MainWindow(object):
         self.label1_8.setText(_translate("MainWindow", "Pt8"))
         self.calibration_out.setText(_translate("MainWindow", "calibration_file_output"))
         self.clearAndClose.setText(_translate("MainWindow", "clear / close"))
-        self.change_calibration.setText(_translate("MainWindow", "state_calib"))
+        self.reportGenerating.setText(_translate("MainWindow", "reportGenerating"))
         self.channel5.setText(_translate("MainWindow", "channel5"))
         self.channel6.setText(_translate("MainWindow", "channel6"))
         self.channel1.setText(_translate("MainWindow", "channel1"))
-        self.catchWave.setText(_translate("MainWindow", "Catch wave"))
+        self.catchWave.setText(_translate("MainWindow", "catchingWave"))
         self.channel3.setText(_translate("MainWindow", "channel3"))
         self.channel0.setText(_translate("MainWindow", "channel0"))
         self.channel2.setText(_translate("MainWindow", "channel2"))
