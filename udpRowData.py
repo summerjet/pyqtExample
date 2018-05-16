@@ -10,7 +10,7 @@ HS_LIDAR_GT_SERIAL_UNIT_SIZE = 12
 HS_LIDAR_GT_Unit_Num         = 8
 HS_LIDAR_GT_recevbuf_Size    = HS_LIDAR_GT_SERIAL_UNIT_SIZE*HS_LIDAR_GT_Unit_Num
 
-myq = Queue.Queue(maxsize = 4+1)
+myq = Queue.Queue(maxsize = 1)
 threading_out = 0
 
 port = 8083
@@ -28,8 +28,9 @@ def socket_putin():
             myq.put(data)
             num +=1
             while myq.full() == 1:
+                data, addr = s.recvfrom(HS_LIDAR_GT_recevbuf_Size)
                 # print "queue full size = ",myq.qsize(), "qsize is full ! \n\n"
-                time.sleep(0.05)
+                # time.sleep(0.01)
                 #if threading_out:
                     #exit()
                 #put_flag=0
@@ -38,6 +39,7 @@ def socket_putin():
                 #break
                 #print "unnormal ''''"
                 #exit()
+                num = 0
 
 class wave_receive_thread(threading.Thread):
     def __init__(self, thread_num=0, timeout=1.0):
@@ -102,7 +104,7 @@ class distannce_parse():
         self.data_channel6_width, self.data_channel6_distance = [], []
         self.data_channel7_width, self.data_channel7_distance = [], []
         
-        while myq.qsize()<=3:
+        while myq.qsize()==0:
             waiting=[]
         
         recevbuf = myq.get()
@@ -123,7 +125,7 @@ class distannce_parse():
             
             index += HS_LIDAR_GT_SERIAL_UNIT_SIZE
 
-        for k in range(len(self.ChannelId)):
+        for k in range(8):
             if self.ChannelId[k] == 1:
                 self.data_channel0_width.append(self.width_buf[k])
                 self.data_channel0_distance.append(self.distance_buf[k])
@@ -161,6 +163,17 @@ class distannce_parse():
         #print self.data_channel7_distance
         #plt.plot(self.data_channel_all[0:500],'r.--')  
         #plt.show()  
+        if self.data_channel0_width or self.data_channel1_width or \
+            self.data_channel2_width or self.data_channel3_width:
+            self.data_channel4_width, self.data_channel4_distance = [0],[0]
+            self.data_channel5_width, self.data_channel5_distance = [0],[0]
+            self.data_channel6_width, self.data_channel6_distance = [0],[0]
+            self.data_channel7_width, self.data_channel7_distance = [0],[0]
+        else:
+            self.data_channel0_width, self.data_channel0_distance = [0],[0]
+            self.data_channel1_width, self.data_channel1_distance = [0],[0]
+            self.data_channel2_width, self.data_channel2_distance = [0],[0]
+            self.data_channel3_width, self.data_channel3_distance = [0],[0]
         if channel == 0:
             self.width = self.data_channel0_width[0]
             self.distance = self.data_channel0_distance[0]
@@ -187,7 +200,8 @@ class distannce_parse():
             self.distance = self.data_channel7_distance[0]
         #print "id = ",self.ChannelId
         #print "width = ", self.width_buf,"\n", "distance = ", self.distance_buf
-        print "recbuf = ",self.width, self.distance
+        print "dataSel : ","width = ",self.width," distance = ", self.distance
+        #print "recbuf = ",self.data_channel0_width[0], self.data_channel0_distance[0]
         return self.width, self.distance
         
 
@@ -209,24 +223,24 @@ if __name__ == '__main__':
     
     ret1 = wave_receive_thread()
     ret1.start()
-    # try:
+    try:
     
-    datahandle = distannce_parse()
-    width_list, distance_list = [], []
+        datahandle = distannce_parse()
+        width_list, distance_list = [], []
 
-    for i in range(80):
-        width_temp, distance_temp = [], []
-        width_temp, distance_temp = datahandle.wave_data_catch(channel_opt)
-        
-        width_list.append(width_temp)
-        distance_list.append(distance_temp)
-    ret1.stop()
-    ret1.join()
+        for i in range(10000):
+            width_temp, distance_temp = [], []
+            width_temp, distance_temp = datahandle.wave_data_catch(channel_opt)
+            if distance_temp:
+                width_list.append(width_temp)
+                distance_list.append(distance_temp)
+        ret1.stop()
+        ret1.join()
     
         
-    # except:
-    #     print "creating treading failed !!!"
-    print "channel %d"%channel_opt,"\n",width_list,"\n", distance_list,"\n\n"
+    except:
+        print "creating treading failed !!!"
+    print "channel %d"%channel_opt,"\n",len(width_list),"", len(distance_list),"\n\n"
     #print "threding is over !"
     try:
         print "congratulation to you !"
@@ -234,11 +248,11 @@ if __name__ == '__main__':
         # print width_list, "len(width_list) =", len(width_list)
         # print distance_list, "len(distance_list) =", len(distance_list)
         # print "width std =", np.std(width_list)," distance std =", np.std(distance_list)
-        #plt.plot(distance_list,width_list,'bo')
-        #plt.xlabel(" posedge_of_pulse /ns")
-        #plt.ylabel(" width_of_pulse /bit")
-        #plt.title("divergence_of_signal")
-        #plt.show()
+        plt.plot(width_list,distance_list,'bo')
+        plt.ylabel(" distance /m")
+        plt.xlabel(" width_of_pulse /m")
+        plt.title("width --- distance ")
+        plt.show()
 
     except:
         print 'widthGetting error!!'

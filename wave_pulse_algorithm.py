@@ -5,15 +5,21 @@ import numpy as np
 import time
 import threading
 import Queue
+import matplotlib.animation as animation
 
 
-myq = Queue.Queue(maxsize = 5200+1)
+myq2 = Queue.Queue(maxsize = 5200+1)
 threading_out = 0
 
 port = 8081
 s = socket.socket(socket.AF_INET,socket.SOCK_DGRAM)   
 s.bind(("",port))  
 time.sleep(0.1)
+
+# fig1 = plt.figure(1)
+# ax = plt.subplot(111,xlim=(0, 3500), ylim=(0,255))
+# line, = ax.plot([],[],'bo--',lw=2)
+
 print 'waiting on port:',port,"\n"
 
 def socket_putin():
@@ -26,12 +32,12 @@ def socket_putin():
             data, addr = s.recvfrom(202)
             if ord(data[200])==1:
                 #print "starting catching...",ord(data[200])
-                #myq.put(data)
-                #print "qsize =",myq.qsize(),"flag =", ord(data[200])
+                #myq2.put(data)
+                #print "qsize =",myq2.qsize(),"flag =", ord(data[200])
                 put_flag=1
                 while put_flag:
                     data, addr = s.recvfrom(202)
-                    myq.put(data)
+                    myq2.put(data)
                     num +=1
 
                     #print ord(data[200])
@@ -40,8 +46,8 @@ def socket_putin():
                         num =0
                         index+=1
 
-                    while myq.full() == 1:
-                        #print "queue full size = ",myq.qsize(), "qsize is full ! \n\n"
+                    while myq2.full() == 1:
+                        # print "queue full size = ",myq2.qsize(), "qsize is full ! \n\n"
                         time.sleep(1)
                         #if threading_out:
                             #exit()
@@ -50,11 +56,9 @@ def socket_putin():
                         #s.close()
                         #break
                         #print "unnormal ''''"
-                        #exit()
+                        # exit()
 
-
-
-class wave_receive_thread(threading.Thread):
+class wave_receive_thread2(threading.Thread):
     def __init__(self, thread_num=0, timeout=1.0):
         threading.Thread.__init__(self)
         self.thread_num = thread_num
@@ -81,14 +85,14 @@ class wave_receive_thread(threading.Thread):
     def isStopped(self):
         return self.stopped
 
-
-class distannce_parse():
+class distannce_parse2():
 
     def __init__(self):
         
+        self.channel_opt = 0
         self.distance = 0
         self.treshold = 65
-        self.delay = 0
+        self.delay = 20
         self.allChannelData = []
         self.ptIndex =[]
 
@@ -97,10 +101,13 @@ class distannce_parse():
         self.data_channel1=[]
         self.data_channel2=[]
         self.data_channel3=[]
+        
 
     def wave_data_catch(self,channel=0):
-        #print "before clearing myq.qsize() =",myq.qsize()
-        myq.queue.clear() 
+        #print "before clearing myq2.qsize() =",myq2.qsize()
+        self.showchannel = channel
+        print "channel = ", self.showchannel
+        myq2.queue.clear() 
         data_temp=[]
         data_get=[]
         self.data_channel_all = []
@@ -113,20 +120,20 @@ class distannce_parse():
         breakout_get=1
         data_handle_flag=1
         num_data=0
-        while myq.qsize()<=70:
+        while myq2.qsize()<=70:
             waiting=[]
-        #print "qsize = ", myq.qsize()
+        #print "qsize = ", myq2.qsize()
 
         while breakout_get:
             #time.sleep(0.01)
             
-            data_get = myq.get()
-            #print "starting catching data ... myq.qsize()=", myq.qsize()
+            data_get = myq2.get()
+            #print "starting catching data ... myq2.qsize()=", myq2.qsize()
             if ord(data_get[200])>0:
                 #print "here*************************************************"
                 while data_handle_flag:
-                    if int(myq.qsize())>=70:
-                        data_get = myq.get()
+                    if int(myq2.qsize())>=70:
+                        data_get = myq2.get()
                         num_data+=1
                         for k in range(len(data_get)-1):
                             data_temp.append(ord(data_get[k]))
@@ -143,7 +150,7 @@ class distannce_parse():
                                                            
                             for z1 in range(320):
                                 for z2 in range(8):
-                                    self.data_channel_all.append(data_temp[z1*32+channel*8+z2])
+                                    self.data_channel_all.append(data_temp[z1*32+self.showchannel*8+z2])
                                     self.data_channel0.append(data_temp[z1*32+0*8+z2])
                                     self.data_channel1.append(data_temp[z1*32+1*8+z2])
                                     self.data_channel2.append(data_temp[z1*32+2*8+z2])
@@ -160,7 +167,7 @@ class distannce_parse():
                             self.data_channel1=[]
                             self.data_channel2=[]
                             self.data_channel3=[]
-                            #print "number of datacatch =",num_data,"myqsize =", myq.qsize()
+                            #print "number of datacatch =",num_data,"myqsize =", myq2.qsize()
                             #break
                         '''    
                         except:
@@ -178,8 +185,9 @@ class distannce_parse():
         #print self.data_channel_all
         #plt.plot(self.data_channel_all[0:500],'r.--')  
         #plt.show()  
+        # data_o = [a*0.15 for a in self.data_channel_all]
         return self.data_channel_all
-
+        # 
     def pulseSignal(self):
 
         self.allChannelData = self.data_channel_all
@@ -276,15 +284,29 @@ class distannce_parse():
 
         plt.plot(x[0:200],y[0:200],'*--')
         plt.plot([width_left,width_right],[threshold,threshold],'ro--')
+        plt.xlabel('time of the point /ns')
+        plt.ylabel('wave signal /bit')
+        plt.title('channel %s pulse signal'%self.showchannel)
         plt.show()
         
         distance = []
-        width =round(width_right-width_left,4)
-        distance = round(width_left,4)
+        width =round(width_right-width_left,4)*0.15
+        distance = round(width_left,4)*0.15
         #print "width = ", width, "  distance = ",distance    
 
         return width,distance
 
+    # def animation_setdata(self,i):
+    #     waveData = self.wave_data_catch(self.channel_opt)
+    #     x = range(len(waveData))
+    #     line.set_data(x,waveData)
+
+    # def waveAnimation(self):
+    #     anim1 = animation.FuncAnimation(fig1, self.animation_setdata,interval=100)
+    #     plt.show()
+        
+        
+        
 
         
 
@@ -311,13 +333,13 @@ if __name__ == '__main__':
     
     #socketReceiv = wave_show.socket_receive()
    
-    ret1 = wave_receive_thread()
+    ret1 = wave_receive_thread2()
     ret1.start()
     width_list =[]
     distance_list=[]
 
     try:
-        datahandle = distannce_parse()
+        datahandle = distannce_parse2()
         for i in range(1):
             time.sleep(0.01)
             pSignal=datahandle.wave_data_catch(channel_opt)

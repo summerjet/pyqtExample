@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg
 import matplotlib.animation as animation
 
-from ui_mainwindow import Ui_MainWindow
+from ui_mainwindow import Ui_LiDAR_Calibration
 #from wave_pulse_algorithm import distannce_parse, wave_receive_thread
 import time
 import csv
@@ -12,10 +12,6 @@ import random
 import numpy
 from optparse import OptionParser
 import sys
-
-
-
-
 
 if __name__ == '__main__':
 	parser = OptionParser(usage="%prog [-v]", version="%prog 1.0")
@@ -30,10 +26,9 @@ if __name__ == '__main__':
 
 	app = QApplication(sys.argv)
 	window = QMainWindow()
-	ui = Ui_MainWindow()
+	ui = Ui_LiDAR_Calibration()
 	ui.setupUi(window)
 	ui.initialAll(pDistance)
-
 	window.show()
 	sys.exit(app.exec_())
 
