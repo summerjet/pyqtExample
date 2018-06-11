@@ -10,6 +10,7 @@ from reportlab.pdfgen import canvas
 from reportlab.lib.utils import ImageReader
 from wave_pulse_algorithm import distannce_parse2, wave_receive_thread2
 from udpRowData import distannce_parse, wave_receive_thread
+
 import time
 import random
 import numpy
@@ -20,6 +21,7 @@ import csv
 from PyQt5.QtWidgets import  QDialog, QFileDialog, QPushButton, QGridLayout
 import sys
 import os
+
 
 from PyQt5.QtWidgets import QApplication, QWidget, QInputDialog, QLineEdit, QFileDialog
 from PyQt5.QtGui import QIcon
@@ -1030,9 +1032,9 @@ class Ui_LiDAR_Calibration(object):
         # waveShowHandle.waveAnimation()
 
         fig1 = matplotlib.pyplot.figure(1,figsize=(18,4))
-        ax = matplotlib.pyplot.subplot(111,xlim=(0, 15), ylim=(0,255))
+        ax = matplotlib.pyplot.subplot(111,xlim=(0, 400), ylim=(0,255))
         line, = ax.plot([],[],'bo--',lw=2)
-        line1, = ax.plot([0,120],[150,150],'ro--',lw=1)
+        line1, = ax.plot([0,120],[120,120],'ro--',lw=1)
         matplotlib.pyplot.title("channel %d"%int(channel_sel))
         matplotlib.pyplot.xlabel("time /(ns*0.15)=m")
         matplotlib.pyplot.ylabel("ADC signal /bit")
@@ -1099,7 +1101,7 @@ class Ui_LiDAR_Calibration(object):
         return width_list, distance_list
     
     def udpRowData_width_distance_catch_func(self):
-        points_num=5000
+        points_num=3500
         self.channel_opt = 0
         channel_sel = self.wave_channel_sel()
         
@@ -1109,14 +1111,24 @@ class Ui_LiDAR_Calibration(object):
         for i in range(points_num):
             #time.sleep(0.01)
             cnt += 1
-            self.dataCatchingprogress.setValue(int(cnt/50.0))
+            self.dataCatchingprogress.setValue(int(cnt/35.0))
             width_temp, distance_temp = [], []
             width_temp, distance_temp = datahandle.wave_data_catch(channel_sel)
-            if width_temp and distance_temp <= 30.0:
+            if width_temp and 0.5 < distance_temp <= 30.0:
                 width_list.append(width_temp)
                 distance_list.append(distance_temp)
 
         return width_list, distance_list
+    
+    def serial_oneline(self):
+        points_num=100
+        self.channel_opt = 0
+        channel_sel = self.wave_channel_sel()
+        
+        datahandle = distannce_parse()
+        width_list, distance_list = [], []
+        cnt = 0
+
     def width_distance_udp_sum(self):
         #temp_width,temp_distance = self.waveAlgorithm_width_distance_catch_func()
         temp_width,temp_distance = self.udpRowData_width_distance_catch_func()
