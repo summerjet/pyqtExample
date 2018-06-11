@@ -10,6 +10,7 @@ from reportlab.pdfgen import canvas
 from reportlab.lib.utils import ImageReader
 from wave_pulse_algorithm import distannce_parse2, wave_receive_thread2
 from udpRowData import distannce_parse, wave_receive_thread
+import oneline 
 import time
 import random
 import numpy
@@ -21,15 +22,18 @@ from PyQt5.QtWidgets import  QDialog, QFileDialog, QPushButton, QGridLayout
 import sys
 import os
 
+
 from PyQt5.QtWidgets import QApplication, QWidget, QInputDialog, QLineEdit, QFileDialog
 from PyQt5.QtGui import QIcon
 
 from PyQt5 import QtCore, QtGui, QtWidgets
- 
+
 class Ui_LiDAR_Calibration(object):
     def setupUi(self, LiDAR_Calibration):
         LiDAR_Calibration.setObjectName("LiDAR_Calibration")
         LiDAR_Calibration.resize(1800, 1080)
+        LiDAR_Calibration.setLocale(QtCore.QLocale(QtCore.QLocale.English, QtCore.QLocale.UnitedStates))
+        LiDAR_Calibration.setIconSize(QtCore.QSize(25, 25))
         self.centralwidget = QtWidgets.QWidget(LiDAR_Calibration)
         self.centralwidget.setObjectName("centralwidget")
         self.pyplotWidget = QtWidgets.QWidget(self.centralwidget)
@@ -42,6 +46,17 @@ class Ui_LiDAR_Calibration(object):
         self.gridLayout.setSizeConstraint(QtWidgets.QLayout.SetDefaultConstraint)
         self.gridLayout.setContentsMargins(0, 0, 0, 0)
         self.gridLayout.setObjectName("gridLayout")
+        self.PT_Slider1 = QtWidgets.QSlider(self.layoutWidget)
+        self.PT_Slider1.setCursor(QtGui.QCursor(QtCore.Qt.SplitHCursor))
+        self.PT_Slider1.setMouseTracking(False)
+        self.PT_Slider1.setMaximum(5000)
+        self.PT_Slider1.setSingleStep(1)
+        self.PT_Slider1.setProperty("value", 0)
+        self.PT_Slider1.setSliderPosition(0)
+        self.PT_Slider1.setTracking(True)
+        self.PT_Slider1.setOrientation(QtCore.Qt.Horizontal)
+        self.PT_Slider1.setObjectName("PT_Slider1")
+        self.gridLayout.addWidget(self.PT_Slider1, 11, 2, 1, 1)
         self.PT_Slider7 = QtWidgets.QSlider(self.layoutWidget)
         self.PT_Slider7.setCursor(QtGui.QCursor(QtCore.Qt.SplitHCursor))
         self.PT_Slider7.setMouseTracking(False)
@@ -49,7 +64,7 @@ class Ui_LiDAR_Calibration(object):
         self.PT_Slider7.setProperty("value", 0)
         self.PT_Slider7.setOrientation(QtCore.Qt.Horizontal)
         self.PT_Slider7.setObjectName("PT_Slider7")
-        self.gridLayout.addWidget(self.PT_Slider7, 16, 2, 1, 1)
+        self.gridLayout.addWidget(self.PT_Slider7, 17, 2, 1, 1)
         self.label1 = QtWidgets.QLabel(self.layoutWidget)
         self.label1.setMinimumSize(QtCore.QSize(0, 0))
         font = QtGui.QFont()
@@ -60,7 +75,7 @@ class Ui_LiDAR_Calibration(object):
         self.label1.setFont(font)
         self.label1.setAlignment(QtCore.Qt.AlignCenter)
         self.label1.setObjectName("label1")
-        self.gridLayout.addWidget(self.label1, 10, 0, 1, 1)
+        self.gridLayout.addWidget(self.label1, 11, 0, 1, 1)
         self.PT_Slider_distance_1 = QtWidgets.QSlider(self.layoutWidget)
         self.PT_Slider_distance_1.setCursor(QtGui.QCursor(QtCore.Qt.SplitHCursor))
         self.PT_Slider_distance_1.setMouseTracking(False)
@@ -69,7 +84,7 @@ class Ui_LiDAR_Calibration(object):
         self.PT_Slider_distance_1.setProperty("value", 0)
         self.PT_Slider_distance_1.setOrientation(QtCore.Qt.Horizontal)
         self.PT_Slider_distance_1.setObjectName("PT_Slider_distance_1")
-        self.gridLayout.addWidget(self.PT_Slider_distance_1, 10, 1, 1, 1)
+        self.gridLayout.addWidget(self.PT_Slider_distance_1, 11, 1, 1, 1)
         self.PT_Slider_distance_2 = QtWidgets.QSlider(self.layoutWidget)
         self.PT_Slider_distance_2.setCursor(QtGui.QCursor(QtCore.Qt.SplitHCursor))
         self.PT_Slider_distance_2.setMouseTracking(False)
@@ -77,7 +92,7 @@ class Ui_LiDAR_Calibration(object):
         self.PT_Slider_distance_2.setProperty("value", 0)
         self.PT_Slider_distance_2.setOrientation(QtCore.Qt.Horizontal)
         self.PT_Slider_distance_2.setObjectName("PT_Slider_distance_2")
-        self.gridLayout.addWidget(self.PT_Slider_distance_2, 11, 1, 1, 1)
+        self.gridLayout.addWidget(self.PT_Slider_distance_2, 12, 1, 1, 1)
         self.PT_Slider_distance_7 = QtWidgets.QSlider(self.layoutWidget)
         self.PT_Slider_distance_7.setCursor(QtGui.QCursor(QtCore.Qt.SplitHCursor))
         self.PT_Slider_distance_7.setMouseTracking(False)
@@ -85,7 +100,7 @@ class Ui_LiDAR_Calibration(object):
         self.PT_Slider_distance_7.setProperty("value", 0)
         self.PT_Slider_distance_7.setOrientation(QtCore.Qt.Horizontal)
         self.PT_Slider_distance_7.setObjectName("PT_Slider_distance_7")
-        self.gridLayout.addWidget(self.PT_Slider_distance_7, 16, 1, 1, 1)
+        self.gridLayout.addWidget(self.PT_Slider_distance_7, 17, 1, 1, 1)
         self.label1_9 = QtWidgets.QLabel(self.layoutWidget)
         self.label1_9.setMinimumSize(QtCore.QSize(0, 0))
         font = QtGui.QFont()
@@ -96,7 +111,7 @@ class Ui_LiDAR_Calibration(object):
         self.label1_9.setFont(font)
         self.label1_9.setAlignment(QtCore.Qt.AlignCenter)
         self.label1_9.setObjectName("label1_9")
-        self.gridLayout.addWidget(self.label1_9, 18, 0, 1, 1)
+        self.gridLayout.addWidget(self.label1_9, 19, 0, 1, 1)
         self.PT_Slider_distance_9 = QtWidgets.QSlider(self.layoutWidget)
         self.PT_Slider_distance_9.setCursor(QtGui.QCursor(QtCore.Qt.SplitHCursor))
         self.PT_Slider_distance_9.setMouseTracking(False)
@@ -104,7 +119,7 @@ class Ui_LiDAR_Calibration(object):
         self.PT_Slider_distance_9.setProperty("value", 0)
         self.PT_Slider_distance_9.setOrientation(QtCore.Qt.Horizontal)
         self.PT_Slider_distance_9.setObjectName("PT_Slider_distance_9")
-        self.gridLayout.addWidget(self.PT_Slider_distance_9, 18, 1, 1, 1)
+        self.gridLayout.addWidget(self.PT_Slider_distance_9, 19, 1, 1, 1)
         self.PT_Slider9 = QtWidgets.QSlider(self.layoutWidget)
         self.PT_Slider9.setCursor(QtGui.QCursor(QtCore.Qt.SplitHCursor))
         self.PT_Slider9.setMouseTracking(False)
@@ -112,7 +127,7 @@ class Ui_LiDAR_Calibration(object):
         self.PT_Slider9.setProperty("value", 0)
         self.PT_Slider9.setOrientation(QtCore.Qt.Horizontal)
         self.PT_Slider9.setObjectName("PT_Slider9")
-        self.gridLayout.addWidget(self.PT_Slider9, 18, 2, 1, 1)
+        self.gridLayout.addWidget(self.PT_Slider9, 19, 2, 1, 1)
         self.label1_10 = QtWidgets.QLabel(self.layoutWidget)
         font = QtGui.QFont()
         font.setPointSize(13)
@@ -122,7 +137,7 @@ class Ui_LiDAR_Calibration(object):
         self.label1_10.setFont(font)
         self.label1_10.setAlignment(QtCore.Qt.AlignCenter)
         self.label1_10.setObjectName("label1_10")
-        self.gridLayout.addWidget(self.label1_10, 19, 0, 1, 1)
+        self.gridLayout.addWidget(self.label1_10, 20, 0, 1, 1)
         self.label1_6 = QtWidgets.QLabel(self.layoutWidget)
         self.label1_6.setMinimumSize(QtCore.QSize(0, 0))
         font = QtGui.QFont()
@@ -133,7 +148,7 @@ class Ui_LiDAR_Calibration(object):
         self.label1_6.setFont(font)
         self.label1_6.setAlignment(QtCore.Qt.AlignCenter)
         self.label1_6.setObjectName("label1_6")
-        self.gridLayout.addWidget(self.label1_6, 15, 0, 1, 1)
+        self.gridLayout.addWidget(self.label1_6, 16, 0, 1, 1)
         self.PT_Slider3 = QtWidgets.QSlider(self.layoutWidget)
         self.PT_Slider3.setCursor(QtGui.QCursor(QtCore.Qt.SplitHCursor))
         self.PT_Slider3.setMouseTracking(False)
@@ -141,7 +156,7 @@ class Ui_LiDAR_Calibration(object):
         self.PT_Slider3.setProperty("value", 0)
         self.PT_Slider3.setOrientation(QtCore.Qt.Horizontal)
         self.PT_Slider3.setObjectName("PT_Slider3")
-        self.gridLayout.addWidget(self.PT_Slider3, 12, 2, 1, 1)
+        self.gridLayout.addWidget(self.PT_Slider3, 13, 2, 1, 1)
         self.label1_5 = QtWidgets.QLabel(self.layoutWidget)
         self.label1_5.setMinimumSize(QtCore.QSize(0, 0))
         font = QtGui.QFont()
@@ -152,7 +167,7 @@ class Ui_LiDAR_Calibration(object):
         self.label1_5.setFont(font)
         self.label1_5.setAlignment(QtCore.Qt.AlignCenter)
         self.label1_5.setObjectName("label1_5")
-        self.gridLayout.addWidget(self.label1_5, 14, 0, 1, 1)
+        self.gridLayout.addWidget(self.label1_5, 15, 0, 1, 1)
         self.PT_Slider_distance_8 = QtWidgets.QSlider(self.layoutWidget)
         self.PT_Slider_distance_8.setCursor(QtGui.QCursor(QtCore.Qt.SplitHCursor))
         self.PT_Slider_distance_8.setMouseTracking(False)
@@ -160,7 +175,7 @@ class Ui_LiDAR_Calibration(object):
         self.PT_Slider_distance_8.setProperty("value", 0)
         self.PT_Slider_distance_8.setOrientation(QtCore.Qt.Horizontal)
         self.PT_Slider_distance_8.setObjectName("PT_Slider_distance_8")
-        self.gridLayout.addWidget(self.PT_Slider_distance_8, 17, 1, 1, 1)
+        self.gridLayout.addWidget(self.PT_Slider_distance_8, 18, 1, 1, 1)
         self.label1_4 = QtWidgets.QLabel(self.layoutWidget)
         self.label1_4.setMinimumSize(QtCore.QSize(0, 0))
         font = QtGui.QFont()
@@ -171,7 +186,7 @@ class Ui_LiDAR_Calibration(object):
         self.label1_4.setFont(font)
         self.label1_4.setAlignment(QtCore.Qt.AlignCenter)
         self.label1_4.setObjectName("label1_4")
-        self.gridLayout.addWidget(self.label1_4, 13, 0, 1, 1)
+        self.gridLayout.addWidget(self.label1_4, 14, 0, 1, 1)
         self.channel4 = QtWidgets.QCheckBox(self.layoutWidget)
         font = QtGui.QFont()
         font.setPointSize(15)
@@ -186,199 +201,6 @@ class Ui_LiDAR_Calibration(object):
         self.channel4.setIconSize(QtCore.QSize(28, 28))
         self.channel4.setObjectName("channel4")
         self.gridLayout.addWidget(self.channel4, 1, 2, 1, 1)
-        self.PT_Slider1 = QtWidgets.QSlider(self.layoutWidget)
-        self.PT_Slider1.setCursor(QtGui.QCursor(QtCore.Qt.SplitHCursor))
-        self.PT_Slider1.setMouseTracking(False)
-        self.PT_Slider1.setMaximum(5000)
-        self.PT_Slider1.setSingleStep(1)
-        self.PT_Slider1.setProperty("value", 0)
-        self.PT_Slider1.setSliderPosition(0)
-        self.PT_Slider1.setTracking(True)
-        self.PT_Slider1.setOrientation(QtCore.Qt.Horizontal)
-        self.PT_Slider1.setObjectName("PT_Slider1")
-        self.gridLayout.addWidget(self.PT_Slider1, 10, 2, 1, 1)
-        self.PT_Slider_distance_4 = QtWidgets.QSlider(self.layoutWidget)
-        self.PT_Slider_distance_4.setCursor(QtGui.QCursor(QtCore.Qt.SplitHCursor))
-        self.PT_Slider_distance_4.setMouseTracking(False)
-        self.PT_Slider_distance_4.setMaximum(5000)
-        self.PT_Slider_distance_4.setProperty("value", 0)
-        self.PT_Slider_distance_4.setOrientation(QtCore.Qt.Horizontal)
-        self.PT_Slider_distance_4.setObjectName("PT_Slider_distance_4")
-        self.gridLayout.addWidget(self.PT_Slider_distance_4, 13, 1, 1, 1)
-        self.PT_Slider4 = QtWidgets.QSlider(self.layoutWidget)
-        self.PT_Slider4.setCursor(QtGui.QCursor(QtCore.Qt.SplitHCursor))
-        self.PT_Slider4.setMouseTracking(False)
-        self.PT_Slider4.setMaximum(5000)
-        self.PT_Slider4.setProperty("value", 0)
-        self.PT_Slider4.setOrientation(QtCore.Qt.Horizontal)
-        self.PT_Slider4.setObjectName("PT_Slider4")
-        self.gridLayout.addWidget(self.PT_Slider4, 13, 2, 1, 1)
-        self.label1_7 = QtWidgets.QLabel(self.layoutWidget)
-        self.label1_7.setMinimumSize(QtCore.QSize(0, 0))
-        font = QtGui.QFont()
-        font.setPointSize(13)
-        font.setBold(True)
-        font.setItalic(True)
-        font.setWeight(75)
-        self.label1_7.setFont(font)
-        self.label1_7.setAlignment(QtCore.Qt.AlignCenter)
-        self.label1_7.setObjectName("label1_7")
-        self.gridLayout.addWidget(self.label1_7, 16, 0, 1, 1)
-        self.label1_2 = QtWidgets.QLabel(self.layoutWidget)
-        self.label1_2.setMinimumSize(QtCore.QSize(0, 0))
-        font = QtGui.QFont()
-        font.setPointSize(13)
-        font.setBold(True)
-        font.setItalic(True)
-        font.setWeight(75)
-        self.label1_2.setFont(font)
-        self.label1_2.setAlignment(QtCore.Qt.AlignCenter)
-        self.label1_2.setObjectName("label1_2")
-        self.gridLayout.addWidget(self.label1_2, 11, 0, 1, 1)
-        self.PT_Slider_distance_3 = QtWidgets.QSlider(self.layoutWidget)
-        self.PT_Slider_distance_3.setCursor(QtGui.QCursor(QtCore.Qt.SplitHCursor))
-        self.PT_Slider_distance_3.setMouseTracking(False)
-        self.PT_Slider_distance_3.setMaximum(5000)
-        self.PT_Slider_distance_3.setProperty("value", 0)
-        self.PT_Slider_distance_3.setOrientation(QtCore.Qt.Horizontal)
-        self.PT_Slider_distance_3.setObjectName("PT_Slider_distance_3")
-        self.gridLayout.addWidget(self.PT_Slider_distance_3, 12, 1, 1, 1)
-        self.PT_Slider8 = QtWidgets.QSlider(self.layoutWidget)
-        self.PT_Slider8.setCursor(QtGui.QCursor(QtCore.Qt.SplitHCursor))
-        self.PT_Slider8.setMouseTracking(False)
-        self.PT_Slider8.setMaximum(5000)
-        self.PT_Slider8.setProperty("value", 0)
-        self.PT_Slider8.setOrientation(QtCore.Qt.Horizontal)
-        self.PT_Slider8.setObjectName("PT_Slider8")
-        self.gridLayout.addWidget(self.PT_Slider8, 17, 2, 1, 1)
-        self.label1_3 = QtWidgets.QLabel(self.layoutWidget)
-        self.label1_3.setMinimumSize(QtCore.QSize(0, 0))
-        font = QtGui.QFont()
-        font.setPointSize(13)
-        font.setBold(True)
-        font.setItalic(True)
-        font.setWeight(75)
-        self.label1_3.setFont(font)
-        self.label1_3.setAlignment(QtCore.Qt.AlignCenter)
-        self.label1_3.setObjectName("label1_3")
-        self.gridLayout.addWidget(self.label1_3, 12, 0, 1, 1)
-        self.PT_Slider_distance_6 = QtWidgets.QSlider(self.layoutWidget)
-        self.PT_Slider_distance_6.setCursor(QtGui.QCursor(QtCore.Qt.SplitHCursor))
-        self.PT_Slider_distance_6.setMouseTracking(False)
-        self.PT_Slider_distance_6.setMaximum(5000)
-        self.PT_Slider_distance_6.setProperty("value", 0)
-        self.PT_Slider_distance_6.setOrientation(QtCore.Qt.Horizontal)
-        self.PT_Slider_distance_6.setObjectName("PT_Slider_distance_6")
-        self.gridLayout.addWidget(self.PT_Slider_distance_6, 15, 1, 1, 1)
-        self.PT_Slider6 = QtWidgets.QSlider(self.layoutWidget)
-        self.PT_Slider6.setCursor(QtGui.QCursor(QtCore.Qt.SplitHCursor))
-        self.PT_Slider6.setMouseTracking(False)
-        self.PT_Slider6.setMaximum(5000)
-        self.PT_Slider6.setProperty("value", 0)
-        self.PT_Slider6.setOrientation(QtCore.Qt.Horizontal)
-        self.PT_Slider6.setObjectName("PT_Slider6")
-        self.gridLayout.addWidget(self.PT_Slider6, 15, 2, 1, 1)
-        self.label1_8 = QtWidgets.QLabel(self.layoutWidget)
-        self.label1_8.setMinimumSize(QtCore.QSize(0, 0))
-        font = QtGui.QFont()
-        font.setPointSize(13)
-        font.setBold(True)
-        font.setItalic(True)
-        font.setWeight(75)
-        self.label1_8.setFont(font)
-        self.label1_8.setAlignment(QtCore.Qt.AlignCenter)
-        self.label1_8.setObjectName("label1_8")
-        self.gridLayout.addWidget(self.label1_8, 17, 0, 1, 1)
-        self.PT_Slider_distance_10 = QtWidgets.QSlider(self.layoutWidget)
-        self.PT_Slider_distance_10.setCursor(QtGui.QCursor(QtCore.Qt.SplitHCursor))
-        self.PT_Slider_distance_10.setMouseTracking(False)
-        self.PT_Slider_distance_10.setMaximum(5000)
-        self.PT_Slider_distance_10.setProperty("value", 0)
-        self.PT_Slider_distance_10.setOrientation(QtCore.Qt.Horizontal)
-        self.PT_Slider_distance_10.setObjectName("PT_Slider_distance_10")
-        self.gridLayout.addWidget(self.PT_Slider_distance_10, 19, 1, 1, 1)
-        self.PT_Slider10 = QtWidgets.QSlider(self.layoutWidget)
-        self.PT_Slider10.setCursor(QtGui.QCursor(QtCore.Qt.SplitHCursor))
-        self.PT_Slider10.setMouseTracking(False)
-        self.PT_Slider10.setMaximum(5000)
-        self.PT_Slider10.setProperty("value", 0)
-        self.PT_Slider10.setOrientation(QtCore.Qt.Horizontal)
-        self.PT_Slider10.setObjectName("PT_Slider10")
-        self.gridLayout.addWidget(self.PT_Slider10, 19, 2, 1, 1)
-        self.PT_Slider2 = QtWidgets.QSlider(self.layoutWidget)
-        self.PT_Slider2.setEnabled(True)
-        self.PT_Slider2.setCursor(QtGui.QCursor(QtCore.Qt.SplitHCursor))
-        self.PT_Slider2.setMouseTracking(False)
-        self.PT_Slider2.setMaximum(5000)
-        self.PT_Slider2.setProperty("value", 0)
-        self.PT_Slider2.setOrientation(QtCore.Qt.Horizontal)
-        self.PT_Slider2.setObjectName("PT_Slider2")
-        self.gridLayout.addWidget(self.PT_Slider2, 11, 2, 1, 1)
-        self.PT_Slider_distance_5 = QtWidgets.QSlider(self.layoutWidget)
-        self.PT_Slider_distance_5.setCursor(QtGui.QCursor(QtCore.Qt.SplitHCursor))
-        self.PT_Slider_distance_5.setMouseTracking(False)
-        self.PT_Slider_distance_5.setMaximum(5000)
-        self.PT_Slider_distance_5.setProperty("value", 0)
-        self.PT_Slider_distance_5.setOrientation(QtCore.Qt.Horizontal)
-        self.PT_Slider_distance_5.setObjectName("PT_Slider_distance_5")
-        self.gridLayout.addWidget(self.PT_Slider_distance_5, 14, 1, 1, 1)
-        self.PT_Slider5 = QtWidgets.QSlider(self.layoutWidget)
-        self.PT_Slider5.setCursor(QtGui.QCursor(QtCore.Qt.SplitHCursor))
-        self.PT_Slider5.setMouseTracking(False)
-        self.PT_Slider5.setMaximum(5000)
-        self.PT_Slider5.setProperty("value", 0)
-        self.PT_Slider5.setOrientation(QtCore.Qt.Horizontal)
-        self.PT_Slider5.setObjectName("PT_Slider5")
-        self.gridLayout.addWidget(self.PT_Slider5, 14, 2, 1, 1)
-        self.calibration_out = QtWidgets.QPushButton(self.layoutWidget)
-        font = QtGui.QFont()
-        font.setPointSize(11)
-        font.setBold(True)
-        font.setWeight(75)
-        self.calibration_out.setFont(font)
-        icon1 = QtGui.QIcon()
-        icon1.addPixmap(QtGui.QPixmap(":/icon/pic/output.png"), QtGui.QIcon.Selected, QtGui.QIcon.On)
-        self.calibration_out.setIcon(icon1)
-        self.calibration_out.setIconSize(QtCore.QSize(40, 40))
-        self.calibration_out.setObjectName("calibration_out")
-        self.gridLayout.addWidget(self.calibration_out, 21, 1, 1, 2)
-        self.clearAndClose = QtWidgets.QPushButton(self.layoutWidget)
-        font = QtGui.QFont()
-        font.setPointSize(11)
-        font.setBold(True)
-        font.setWeight(75)
-        self.clearAndClose.setFont(font)
-        self.clearAndClose.setLayoutDirection(QtCore.Qt.LeftToRight)
-        icon2 = QtGui.QIcon()
-        icon2.addPixmap(QtGui.QPixmap(":/icon/pic/clear.png"), QtGui.QIcon.Selected, QtGui.QIcon.On)
-        self.clearAndClose.setIcon(icon2)
-        self.clearAndClose.setIconSize(QtCore.QSize(30, 30))
-        self.clearAndClose.setObjectName("clearAndClose")
-        self.gridLayout.addWidget(self.clearAndClose, 6, 1, 1, 1)
-        self.reportGenerating = QtWidgets.QPushButton(self.layoutWidget)
-        font = QtGui.QFont()
-        font.setPointSize(11)
-        font.setBold(True)
-        font.setWeight(75)
-        self.reportGenerating.setFont(font)
-        self.reportGenerating.setLayoutDirection(QtCore.Qt.LeftToRight)
-        icon3 = QtGui.QIcon()
-        icon3.addPixmap(QtGui.QPixmap(":/icon/pic/import.png"), QtGui.QIcon.Selected, QtGui.QIcon.On)
-        self.reportGenerating.setIcon(icon3)
-        self.reportGenerating.setIconSize(QtCore.QSize(30, 30))
-        self.reportGenerating.setObjectName("reportGenerating")
-        self.gridLayout.addWidget(self.reportGenerating, 5, 2, 1, 1)
-        self.channel5 = QtWidgets.QCheckBox(self.layoutWidget)
-        font = QtGui.QFont()
-        font.setPointSize(15)
-        font.setBold(True)
-        font.setWeight(75)
-        self.channel5.setFont(font)
-        self.channel5.setLayoutDirection(QtCore.Qt.LeftToRight)
-        self.channel5.setIcon(icon)
-        self.channel5.setIconSize(QtCore.QSize(28, 28))
-        self.channel5.setObjectName("channel5")
-        self.gridLayout.addWidget(self.channel5, 2, 2, 1, 1)
         self.channel6 = QtWidgets.QCheckBox(self.layoutWidget)
         font = QtGui.QFont()
         font.setPointSize(15)
@@ -390,6 +212,163 @@ class Ui_LiDAR_Calibration(object):
         self.channel6.setIconSize(QtCore.QSize(28, 28))
         self.channel6.setObjectName("channel6")
         self.gridLayout.addWidget(self.channel6, 3, 2, 1, 1)
+        self.PT_Slider_distance_4 = QtWidgets.QSlider(self.layoutWidget)
+        self.PT_Slider_distance_4.setCursor(QtGui.QCursor(QtCore.Qt.SplitHCursor))
+        self.PT_Slider_distance_4.setMouseTracking(False)
+        self.PT_Slider_distance_4.setMaximum(5000)
+        self.PT_Slider_distance_4.setProperty("value", 0)
+        self.PT_Slider_distance_4.setOrientation(QtCore.Qt.Horizontal)
+        self.PT_Slider_distance_4.setObjectName("PT_Slider_distance_4")
+        self.gridLayout.addWidget(self.PT_Slider_distance_4, 14, 1, 1, 1)
+        self.PT_Slider4 = QtWidgets.QSlider(self.layoutWidget)
+        self.PT_Slider4.setCursor(QtGui.QCursor(QtCore.Qt.SplitHCursor))
+        self.PT_Slider4.setMouseTracking(False)
+        self.PT_Slider4.setMaximum(5000)
+        self.PT_Slider4.setProperty("value", 0)
+        self.PT_Slider4.setOrientation(QtCore.Qt.Horizontal)
+        self.PT_Slider4.setObjectName("PT_Slider4")
+        self.gridLayout.addWidget(self.PT_Slider4, 14, 2, 1, 1)
+        self.label1_7 = QtWidgets.QLabel(self.layoutWidget)
+        self.label1_7.setMinimumSize(QtCore.QSize(0, 0))
+        font = QtGui.QFont()
+        font.setPointSize(13)
+        font.setBold(True)
+        font.setItalic(True)
+        font.setWeight(75)
+        self.label1_7.setFont(font)
+        self.label1_7.setAlignment(QtCore.Qt.AlignCenter)
+        self.label1_7.setObjectName("label1_7")
+        self.gridLayout.addWidget(self.label1_7, 17, 0, 1, 1)
+        self.label1_2 = QtWidgets.QLabel(self.layoutWidget)
+        self.label1_2.setMinimumSize(QtCore.QSize(0, 0))
+        font = QtGui.QFont()
+        font.setPointSize(13)
+        font.setBold(True)
+        font.setItalic(True)
+        font.setWeight(75)
+        self.label1_2.setFont(font)
+        self.label1_2.setAlignment(QtCore.Qt.AlignCenter)
+        self.label1_2.setObjectName("label1_2")
+        self.gridLayout.addWidget(self.label1_2, 12, 0, 1, 1)
+        self.PT_Slider_distance_3 = QtWidgets.QSlider(self.layoutWidget)
+        self.PT_Slider_distance_3.setCursor(QtGui.QCursor(QtCore.Qt.SplitHCursor))
+        self.PT_Slider_distance_3.setMouseTracking(False)
+        self.PT_Slider_distance_3.setMaximum(5000)
+        self.PT_Slider_distance_3.setProperty("value", 0)
+        self.PT_Slider_distance_3.setOrientation(QtCore.Qt.Horizontal)
+        self.PT_Slider_distance_3.setObjectName("PT_Slider_distance_3")
+        self.gridLayout.addWidget(self.PT_Slider_distance_3, 13, 1, 1, 1)
+        self.PT_Slider8 = QtWidgets.QSlider(self.layoutWidget)
+        self.PT_Slider8.setCursor(QtGui.QCursor(QtCore.Qt.SplitHCursor))
+        self.PT_Slider8.setMouseTracking(False)
+        self.PT_Slider8.setMaximum(5000)
+        self.PT_Slider8.setProperty("value", 0)
+        self.PT_Slider8.setOrientation(QtCore.Qt.Horizontal)
+        self.PT_Slider8.setObjectName("PT_Slider8")
+        self.gridLayout.addWidget(self.PT_Slider8, 18, 2, 1, 1)
+        self.label1_3 = QtWidgets.QLabel(self.layoutWidget)
+        self.label1_3.setMinimumSize(QtCore.QSize(0, 0))
+        font = QtGui.QFont()
+        font.setPointSize(13)
+        font.setBold(True)
+        font.setItalic(True)
+        font.setWeight(75)
+        self.label1_3.setFont(font)
+        self.label1_3.setAlignment(QtCore.Qt.AlignCenter)
+        self.label1_3.setObjectName("label1_3")
+        self.gridLayout.addWidget(self.label1_3, 13, 0, 1, 1)
+        self.PT_Slider_distance_6 = QtWidgets.QSlider(self.layoutWidget)
+        self.PT_Slider_distance_6.setCursor(QtGui.QCursor(QtCore.Qt.SplitHCursor))
+        self.PT_Slider_distance_6.setMouseTracking(False)
+        self.PT_Slider_distance_6.setMaximum(5000)
+        self.PT_Slider_distance_6.setProperty("value", 0)
+        self.PT_Slider_distance_6.setOrientation(QtCore.Qt.Horizontal)
+        self.PT_Slider_distance_6.setObjectName("PT_Slider_distance_6")
+        self.gridLayout.addWidget(self.PT_Slider_distance_6, 16, 1, 1, 1)
+        self.PT_Slider6 = QtWidgets.QSlider(self.layoutWidget)
+        self.PT_Slider6.setCursor(QtGui.QCursor(QtCore.Qt.SplitHCursor))
+        self.PT_Slider6.setMouseTracking(False)
+        self.PT_Slider6.setMaximum(5000)
+        self.PT_Slider6.setProperty("value", 0)
+        self.PT_Slider6.setOrientation(QtCore.Qt.Horizontal)
+        self.PT_Slider6.setObjectName("PT_Slider6")
+        self.gridLayout.addWidget(self.PT_Slider6, 16, 2, 1, 1)
+        self.label1_8 = QtWidgets.QLabel(self.layoutWidget)
+        self.label1_8.setMinimumSize(QtCore.QSize(0, 0))
+        font = QtGui.QFont()
+        font.setPointSize(13)
+        font.setBold(True)
+        font.setItalic(True)
+        font.setWeight(75)
+        self.label1_8.setFont(font)
+        self.label1_8.setAlignment(QtCore.Qt.AlignCenter)
+        self.label1_8.setObjectName("label1_8")
+        self.gridLayout.addWidget(self.label1_8, 18, 0, 1, 1)
+        self.PT_Slider_distance_10 = QtWidgets.QSlider(self.layoutWidget)
+        self.PT_Slider_distance_10.setCursor(QtGui.QCursor(QtCore.Qt.SplitHCursor))
+        self.PT_Slider_distance_10.setMouseTracking(False)
+        self.PT_Slider_distance_10.setMaximum(5000)
+        self.PT_Slider_distance_10.setProperty("value", 0)
+        self.PT_Slider_distance_10.setOrientation(QtCore.Qt.Horizontal)
+        self.PT_Slider_distance_10.setObjectName("PT_Slider_distance_10")
+        self.gridLayout.addWidget(self.PT_Slider_distance_10, 20, 1, 1, 1)
+        self.PT_Slider10 = QtWidgets.QSlider(self.layoutWidget)
+        self.PT_Slider10.setCursor(QtGui.QCursor(QtCore.Qt.SplitHCursor))
+        self.PT_Slider10.setMouseTracking(False)
+        self.PT_Slider10.setMaximum(5000)
+        self.PT_Slider10.setProperty("value", 0)
+        self.PT_Slider10.setOrientation(QtCore.Qt.Horizontal)
+        self.PT_Slider10.setObjectName("PT_Slider10")
+        self.gridLayout.addWidget(self.PT_Slider10, 20, 2, 1, 1)
+        self.PT_Slider2 = QtWidgets.QSlider(self.layoutWidget)
+        self.PT_Slider2.setEnabled(True)
+        self.PT_Slider2.setCursor(QtGui.QCursor(QtCore.Qt.SplitHCursor))
+        self.PT_Slider2.setMouseTracking(False)
+        self.PT_Slider2.setMaximum(5000)
+        self.PT_Slider2.setProperty("value", 0)
+        self.PT_Slider2.setOrientation(QtCore.Qt.Horizontal)
+        self.PT_Slider2.setObjectName("PT_Slider2")
+        self.gridLayout.addWidget(self.PT_Slider2, 12, 2, 1, 1)
+        self.PT_Slider_distance_5 = QtWidgets.QSlider(self.layoutWidget)
+        self.PT_Slider_distance_5.setCursor(QtGui.QCursor(QtCore.Qt.SplitHCursor))
+        self.PT_Slider_distance_5.setMouseTracking(False)
+        self.PT_Slider_distance_5.setMaximum(5000)
+        self.PT_Slider_distance_5.setProperty("value", 0)
+        self.PT_Slider_distance_5.setOrientation(QtCore.Qt.Horizontal)
+        self.PT_Slider_distance_5.setObjectName("PT_Slider_distance_5")
+        self.gridLayout.addWidget(self.PT_Slider_distance_5, 15, 1, 1, 1)
+        self.PT_Slider5 = QtWidgets.QSlider(self.layoutWidget)
+        self.PT_Slider5.setCursor(QtGui.QCursor(QtCore.Qt.SplitHCursor))
+        self.PT_Slider5.setMouseTracking(False)
+        self.PT_Slider5.setMaximum(5000)
+        self.PT_Slider5.setProperty("value", 0)
+        self.PT_Slider5.setOrientation(QtCore.Qt.Horizontal)
+        self.PT_Slider5.setObjectName("PT_Slider5")
+        self.gridLayout.addWidget(self.PT_Slider5, 15, 2, 1, 1)
+        self.reportGenerating = QtWidgets.QPushButton(self.layoutWidget)
+        font = QtGui.QFont()
+        font.setPointSize(15)
+        font.setBold(True)
+        font.setWeight(75)
+        self.reportGenerating.setFont(font)
+        self.reportGenerating.setLayoutDirection(QtCore.Qt.LeftToRight)
+        icon1 = QtGui.QIcon()
+        icon1.addPixmap(QtGui.QPixmap(":/icon/pic/import.png"), QtGui.QIcon.Selected, QtGui.QIcon.On)
+        self.reportGenerating.setIcon(icon1)
+        self.reportGenerating.setIconSize(QtCore.QSize(30, 30))
+        self.reportGenerating.setObjectName("reportGenerating")
+        self.gridLayout.addWidget(self.reportGenerating, 6, 2, 1, 1)
+        self.channel5 = QtWidgets.QCheckBox(self.layoutWidget)
+        font = QtGui.QFont()
+        font.setPointSize(15)
+        font.setBold(True)
+        font.setWeight(75)
+        self.channel5.setFont(font)
+        self.channel5.setLayoutDirection(QtCore.Qt.LeftToRight)
+        self.channel5.setIcon(icon)
+        self.channel5.setIconSize(QtCore.QSize(28, 28))
+        self.channel5.setObjectName("channel5")
+        self.gridLayout.addWidget(self.channel5, 2, 2, 1, 1)
         self.channel1 = QtWidgets.QCheckBox(self.layoutWidget)
         font = QtGui.QFont()
         font.setPointSize(15)
@@ -401,19 +380,6 @@ class Ui_LiDAR_Calibration(object):
         self.channel1.setIconSize(QtCore.QSize(28, 28))
         self.channel1.setObjectName("channel1")
         self.gridLayout.addWidget(self.channel1, 2, 1, 1, 1)
-        self.catchWave = QtWidgets.QPushButton(self.layoutWidget)
-        font = QtGui.QFont()
-        font.setPointSize(11)
-        font.setBold(True)
-        font.setWeight(75)
-        self.catchWave.setFont(font)
-        self.catchWave.setLayoutDirection(QtCore.Qt.LeftToRight)
-        icon4 = QtGui.QIcon()
-        icon4.addPixmap(QtGui.QPixmap(":/icon/pic/file-open.png"), QtGui.QIcon.Selected, QtGui.QIcon.On)
-        self.catchWave.setIcon(icon4)
-        self.catchWave.setIconSize(QtCore.QSize(30, 30))
-        self.catchWave.setObjectName("catchWave")
-        self.gridLayout.addWidget(self.catchWave, 5, 1, 1, 1)
         self.channel3 = QtWidgets.QCheckBox(self.layoutWidget)
         font = QtGui.QFont()
         font.setPointSize(15)
@@ -449,17 +415,17 @@ class Ui_LiDAR_Calibration(object):
         self.gridLayout.addWidget(self.channel2, 3, 1, 1, 1)
         self.saveOriginUdpData = QtWidgets.QPushButton(self.layoutWidget)
         font = QtGui.QFont()
-        font.setPointSize(11)
+        font.setPointSize(15)
         font.setBold(True)
         font.setWeight(75)
         self.saveOriginUdpData.setFont(font)
         self.saveOriginUdpData.setLayoutDirection(QtCore.Qt.LeftToRight)
-        icon5 = QtGui.QIcon()
-        icon5.addPixmap(QtGui.QPixmap(":/icon/pic/add.png"), QtGui.QIcon.Selected, QtGui.QIcon.On)
-        self.saveOriginUdpData.setIcon(icon5)
+        icon2 = QtGui.QIcon()
+        icon2.addPixmap(QtGui.QPixmap(":/icon/pic/add.png"), QtGui.QIcon.Selected, QtGui.QIcon.On)
+        self.saveOriginUdpData.setIcon(icon2)
         self.saveOriginUdpData.setIconSize(QtCore.QSize(30, 30))
         self.saveOriginUdpData.setObjectName("saveOriginUdpData")
-        self.gridLayout.addWidget(self.saveOriginUdpData, 6, 2, 1, 1)
+        self.gridLayout.addWidget(self.saveOriginUdpData, 7, 2, 1, 1)
         self.channel7 = QtWidgets.QCheckBox(self.layoutWidget)
         font = QtGui.QFont()
         font.setPointSize(15)
@@ -471,32 +437,75 @@ class Ui_LiDAR_Calibration(object):
         self.channel7.setIconSize(QtCore.QSize(28, 28))
         self.channel7.setObjectName("channel7")
         self.gridLayout.addWidget(self.channel7, 4, 2, 1, 1)
-        self.pulseWidthDistance = QtWidgets.QPushButton(self.layoutWidget)
-        font = QtGui.QFont()
-        font.setPointSize(15)
-        font.setBold(True)
-        font.setWeight(75)
-        self.pulseWidthDistance.setFont(font)
-        icon6 = QtGui.QIcon()
-        icon6.addPixmap(QtGui.QPixmap(":/icon/pic/move.png"), QtGui.QIcon.Selected, QtGui.QIcon.On)
-        self.pulseWidthDistance.setIcon(icon6)
-        self.pulseWidthDistance.setIconSize(QtCore.QSize(30, 30))
-        self.pulseWidthDistance.setObjectName("pulseWidthDistance")
-        self.gridLayout.addWidget(self.pulseWidthDistance, 20, 1, 1, 1)
         self.waveShow = QtWidgets.QPushButton(self.layoutWidget)
         font = QtGui.QFont()
         font.setPointSize(15)
         font.setBold(True)
         font.setWeight(75)
         self.waveShow.setFont(font)
-        icon7 = QtGui.QIcon()
-        icon7.addPixmap(QtGui.QPixmap(":/icon/pic/rotate.png"), QtGui.QIcon.Selected, QtGui.QIcon.On)
-        self.waveShow.setIcon(icon7)
+        icon3 = QtGui.QIcon()
+        icon3.addPixmap(QtGui.QPixmap(":/icon/pic/rotate.png"), QtGui.QIcon.Selected, QtGui.QIcon.On)
+        self.waveShow.setIcon(icon3)
         self.waveShow.setIconSize(QtCore.QSize(30, 30))
         self.waveShow.setObjectName("waveShow")
-        self.gridLayout.addWidget(self.waveShow, 20, 2, 1, 1)
+        self.gridLayout.addWidget(self.waveShow, 21, 2, 1, 1)
+        self.calibration_out = QtWidgets.QPushButton(self.layoutWidget)
+        font = QtGui.QFont()
+        font.setPointSize(15)
+        font.setBold(True)
+        font.setWeight(75)
+        self.calibration_out.setFont(font)
+        icon4 = QtGui.QIcon()
+        icon4.addPixmap(QtGui.QPixmap(":/icon/pic/output.png"), QtGui.QIcon.Selected, QtGui.QIcon.On)
+        self.calibration_out.setIcon(icon4)
+        self.calibration_out.setIconSize(QtCore.QSize(40, 30))
+        self.calibration_out.setObjectName("calibration_out")
+        self.gridLayout.addWidget(self.calibration_out, 22, 0, 1, 3)
+        self.pulseWidthDistance = QtWidgets.QPushButton(self.layoutWidget)
+        font = QtGui.QFont()
+        font.setPointSize(15)
+        font.setBold(True)
+        font.setWeight(75)
+        self.pulseWidthDistance.setFont(font)
+        icon5 = QtGui.QIcon()
+        icon5.addPixmap(QtGui.QPixmap(":/icon/pic/move.png"), QtGui.QIcon.Selected, QtGui.QIcon.On)
+        self.pulseWidthDistance.setIcon(icon5)
+        self.pulseWidthDistance.setIconSize(QtCore.QSize(30, 30))
+        self.pulseWidthDistance.setObjectName("pulseWidthDistance")
+        self.gridLayout.addWidget(self.pulseWidthDistance, 21, 0, 1, 2)
+        self.catchWave = QtWidgets.QPushButton(self.layoutWidget)
+        font = QtGui.QFont()
+        font.setPointSize(15)
+        font.setBold(True)
+        font.setWeight(75)
+        self.catchWave.setFont(font)
+        self.catchWave.setLayoutDirection(QtCore.Qt.LeftToRight)
+        icon6 = QtGui.QIcon()
+        icon6.addPixmap(QtGui.QPixmap(":/icon/pic/file-open.png"), QtGui.QIcon.Selected, QtGui.QIcon.On)
+        self.catchWave.setIcon(icon6)
+        self.catchWave.setIconSize(QtCore.QSize(30, 30))
+        self.catchWave.setObjectName("catchWave")
+        self.gridLayout.addWidget(self.catchWave, 6, 0, 1, 2)
+        self.clearAndClose = QtWidgets.QPushButton(self.layoutWidget)
+        font = QtGui.QFont()
+        font.setPointSize(15)
+        font.setBold(True)
+        font.setWeight(75)
+        self.clearAndClose.setFont(font)
+        self.clearAndClose.setLayoutDirection(QtCore.Qt.LeftToRight)
+        icon7 = QtGui.QIcon()
+        icon7.addPixmap(QtGui.QPixmap(":/icon/pic/clear.png"), QtGui.QIcon.Selected, QtGui.QIcon.On)
+        self.clearAndClose.setIcon(icon7)
+        self.clearAndClose.setIconSize(QtCore.QSize(30, 30))
+        self.clearAndClose.setObjectName("clearAndClose")
+        self.gridLayout.addWidget(self.clearAndClose, 7, 0, 1, 2)
+        self.dataCatchingprogress = QtWidgets.QProgressBar(self.layoutWidget)
+        self.dataCatchingprogress.setProperty("value", 0)
+        self.dataCatchingprogress.setAlignment(QtCore.Qt.AlignLeading|QtCore.Qt.AlignLeft|QtCore.Qt.AlignVCenter)
+        self.dataCatchingprogress.setObjectName("dataCatchingprogress")
+        self.gridLayout.addWidget(self.dataCatchingprogress, 5, 0, 1, 3)
         self.rmse_message = QtWidgets.QTextBrowser(self.centralwidget)
-        self.rmse_message.setGeometry(QtCore.QRect(91, 876, 160, 40))
+        self.rmse_message.setGeometry(QtCore.QRect(74, 868, 160, 40))
         font = QtGui.QFont()
         font.setPointSize(16)
         font.setBold(False)
@@ -504,7 +513,7 @@ class Ui_LiDAR_Calibration(object):
         self.rmse_message.setFont(font)
         self.rmse_message.setObjectName("rmse_message")
         self.label = QtWidgets.QLabel(self.centralwidget)
-        self.label.setGeometry(QtCore.QRect(141, 916, 53, 23))
+        self.label.setGeometry(QtCore.QRect(124, 908, 53, 23))
         font = QtGui.QFont()
         font.setPointSize(15)
         font.setBold(True)
@@ -513,10 +522,10 @@ class Ui_LiDAR_Calibration(object):
         self.label.setFont(font)
         self.label.setObjectName("label")
         self.average_message = QtWidgets.QTextBrowser(self.centralwidget)
-        self.average_message.setGeometry(QtCore.QRect(261, 876, 160, 40))
+        self.average_message.setGeometry(QtCore.QRect(244, 868, 160, 40))
         self.average_message.setObjectName("average_message")
         self.label_2 = QtWidgets.QLabel(self.centralwidget)
-        self.label_2.setGeometry(QtCore.QRect(311, 916, 78, 23))
+        self.label_2.setGeometry(QtCore.QRect(294, 908, 78, 23))
         font = QtGui.QFont()
         font.setPointSize(15)
         font.setBold(True)
@@ -525,10 +534,10 @@ class Ui_LiDAR_Calibration(object):
         self.label_2.setFont(font)
         self.label_2.setObjectName("label_2")
         self.lcdNumber = QtWidgets.QLCDNumber(self.centralwidget)
-        self.lcdNumber.setGeometry(QtCore.QRect(90, 942, 331, 61))
+        self.lcdNumber.setGeometry(QtCore.QRect(73, 939, 331, 61))
         self.lcdNumber.setObjectName("lcdNumber")
         self.label_3 = QtWidgets.QLabel(self.centralwidget)
-        self.label_3.setGeometry(QtCore.QRect(170, 1013, 181, 21))
+        self.label_3.setGeometry(QtCore.QRect(153, 1010, 181, 21))
         font = QtGui.QFont()
         font.setPointSize(15)
         font.setBold(True)
@@ -537,7 +546,7 @@ class Ui_LiDAR_Calibration(object):
         self.label_3.setFont(font)
         self.label_3.setObjectName("label_3")
         self.label_4 = QtWidgets.QLabel(self.centralwidget)
-        self.label_4.setGeometry(QtCore.QRect(110, 846, 128, 23))
+        self.label_4.setGeometry(QtCore.QRect(93, 838, 128, 23))
         font = QtGui.QFont()
         font.setPointSize(15)
         font.setBold(True)
@@ -546,7 +555,7 @@ class Ui_LiDAR_Calibration(object):
         self.label_4.setFont(font)
         self.label_4.setObjectName("label_4")
         self.label_5 = QtWidgets.QLabel(self.centralwidget)
-        self.label_5.setGeometry(QtCore.QRect(270, 845, 205, 23))
+        self.label_5.setGeometry(QtCore.QRect(253, 837, 205, 23))
         font = QtGui.QFont()
         font.setPointSize(15)
         font.setBold(True)
@@ -555,7 +564,7 @@ class Ui_LiDAR_Calibration(object):
         self.label_5.setFont(font)
         self.label_5.setObjectName("label_5")
         self.pulseWidth = QtWidgets.QTextBrowser(self.centralwidget)
-        self.pulseWidth.setGeometry(QtCore.QRect(90, 804, 160, 40))
+        self.pulseWidth.setGeometry(QtCore.QRect(73, 796, 160, 40))
         font = QtGui.QFont()
         font.setPointSize(16)
         font.setBold(False)
@@ -563,7 +572,7 @@ class Ui_LiDAR_Calibration(object):
         self.pulseWidth.setFont(font)
         self.pulseWidth.setObjectName("pulseWidth")
         self.frontDistance = QtWidgets.QTextBrowser(self.centralwidget)
-        self.frontDistance.setGeometry(QtCore.QRect(260, 804, 160, 40))
+        self.frontDistance.setGeometry(QtCore.QRect(243, 796, 160, 40))
         font = QtGui.QFont()
         font.setPointSize(16)
         font.setBold(False)
@@ -698,11 +707,11 @@ class Ui_LiDAR_Calibration(object):
         self.ret.start()
         self.ret2 = wave_receive_thread2()
         self.ret2.start()
+        # self.ret3 = oneline.serial_packet_thread3()
+        # self.ret3.start()
         self.rdData_calcu_data_gen()
-        self.botton_init_value_set()
+        # self.botton_init_value_set()
         self.plot_setup()
-
-        ######
 
         #set up slots and signals
         self.catchWave.clicked.connect(self.width_distance_calculate)
@@ -723,8 +732,6 @@ class Ui_LiDAR_Calibration(object):
         self.actionDistanceWidthScaleTab.triggered.connect(self.distanceWidthScale)
         self.actionOpen.triggered.connect(lambda:self.rawDataFileDialog(self.rawdata_savepath))
 
-
-
         self.channel0.clicked.connect(self.wave_channel_sel)
         self.channel1.clicked.connect(self.wave_channel_sel)
         self.channel2.clicked.connect(self.wave_channel_sel)
@@ -734,27 +741,27 @@ class Ui_LiDAR_Calibration(object):
         self.channel6.clicked.connect(self.wave_channel_sel)
         self.channel7.clicked.connect(self.wave_channel_sel)
 
-        self.PT_Slider1.valueChanged.connect(self.sliderFunc_w1)
-        self.PT_Slider2.valueChanged.connect(self.sliderFunc_w2)
-        self.PT_Slider3.valueChanged.connect(self.sliderFunc_w3)
-        self.PT_Slider4.valueChanged.connect(self.sliderFunc_w4)
-        self.PT_Slider5.valueChanged.connect(self.sliderFunc_w5)
-        self.PT_Slider6.valueChanged.connect(self.sliderFunc_w6)
-        self.PT_Slider7.valueChanged.connect(self.sliderFunc_w7)
-        self.PT_Slider8.valueChanged.connect(self.sliderFunc_w8)
-        self.PT_Slider9.valueChanged.connect(self.sliderFunc_w9)
-        self.PT_Slider10.valueChanged.connect(self.sliderFunc_w10)
+        # self.PT_Slider1.valueChanged.connect(self.sliderFunc_w1)
+        # self.PT_Slider2.valueChanged.connect(self.sliderFunc_w2)
+        # self.PT_Slider3.valueChanged.connect(self.sliderFunc_w3)
+        # self.PT_Slider4.valueChanged.connect(self.sliderFunc_w4)
+        # self.PT_Slider5.valueChanged.connect(self.sliderFunc_w5)
+        # self.PT_Slider6.valueChanged.connect(self.sliderFunc_w6)
+        # self.PT_Slider7.valueChanged.connect(self.sliderFunc_w7)
+        # self.PT_Slider8.valueChanged.connect(self.sliderFunc_w8)
+        # self.PT_Slider9.valueChanged.connect(self.sliderFunc_w9)
+        # self.PT_Slider10.valueChanged.connect(self.sliderFunc_w10)
 
-        self.PT_Slider_distance_1.valueChanged.connect(self.sliderFunc_d1)
-        self.PT_Slider_distance_2.valueChanged.connect(self.sliderFunc_d2)
-        self.PT_Slider_distance_3.valueChanged.connect(self.sliderFunc_d3)
-        self.PT_Slider_distance_4.valueChanged.connect(self.sliderFunc_d4)
-        self.PT_Slider_distance_5.valueChanged.connect(self.sliderFunc_d5)
-        self.PT_Slider_distance_6.valueChanged.connect(self.sliderFunc_d6)
-        self.PT_Slider_distance_7.valueChanged.connect(self.sliderFunc_d7)
-        self.PT_Slider_distance_8.valueChanged.connect(self.sliderFunc_d8)
-        self.PT_Slider_distance_9.valueChanged.connect(self.sliderFunc_d9)
-        self.PT_Slider_distance_10.valueChanged.connect(self.sliderFunc_d10)
+        # self.PT_Slider_distance_1.valueChanged.connect(self.sliderFunc_d1)
+        # self.PT_Slider_distance_2.valueChanged.connect(self.sliderFunc_d2)
+        # self.PT_Slider_distance_3.valueChanged.connect(self.sliderFunc_d3)
+        # self.PT_Slider_distance_4.valueChanged.connect(self.sliderFunc_d4)
+        # self.PT_Slider_distance_5.valueChanged.connect(self.sliderFunc_d5)
+        # self.PT_Slider_distance_6.valueChanged.connect(self.sliderFunc_d6)
+        # self.PT_Slider_distance_7.valueChanged.connect(self.sliderFunc_d7)
+        # self.PT_Slider_distance_8.valueChanged.connect(self.sliderFunc_d8)
+        # self.PT_Slider_distance_9.valueChanged.connect(self.sliderFunc_d9)
+        # self.PT_Slider_distance_10.valueChanged.connect(self.sliderFunc_d10)
    
     def simuGenNew(self):
         try:
@@ -813,169 +820,146 @@ class Ui_LiDAR_Calibration(object):
         else:
             self.DWScale = 1
 
-    def botton_init_value_set(self):
-        self.cal_distance_set_init = []
-        self.cal_width_set_init=[]
-        width_max = max(self.width)
-        width_min = min(self.width)
-        step = 10
-        step_value = (width_max - width_min)/step
+    # def botton_init_value_set(self):
+    #     self.cal_distance_set_init = []
+    #     self.cal_width_set_init=[]
+    #     width_max = max(self.width)
+    #     width_min = min(self.width)
+    #     step = 10
+    #     step_value = (width_max - width_min)/step
 
-        # for r in range(step):
-        #     self.cal_width_set_init.append(r*step_value+0.5*step_value+width_min)
-        cof = [0.3, 0.8, 1.5, 2.5, 3.5, 5, 6.5, 8, 9.5, 11]
-        self.cal_width_set_init=[step_value*arr+width_min for arr in cof]
-        for k in range(step):
-            dis_av_pt = []
-            for m in range(len(self.width)):
-                #if self.width[m]>=(k+0.5)*step_value-step_value*0.2 and self.width[m]<=(k+0.5)*step_value+step_value*0.2:
-                if self.width[m]>=(k+0.5)*step_value-step_value*0.2 and self.width[m]<=(k+0.5)*step_value+step_value*0.2:
-                    dis_av_pt.append(self.distance_delta[m])
-            if dis_av_pt:
-                self.cal_distance_set_init.append(float(numpy.mean(dis_av_pt)))
-            else:
-                self.cal_distance_set_init.append(0)
+    #     # for r in range(step):
+    #     #     self.cal_width_set_init.append(r*step_value+0.5*step_value+width_min)
+    #     cof = [0.3, 0.8, 1.5, 2.5, 3.5, 5, 6.5, 8, 9.5, 11]
+    #     self.cal_width_set_init=[step_value*arr+width_min for arr in cof]
+    #     for k in range(step):
+    #         dis_av_pt = []
+    #         for m in range(len(self.width)):
+    #             #if self.width[m]>=(k+0.5)*step_value-step_value*0.2 and self.width[m]<=(k+0.5)*step_value+step_value*0.2:
+    #             if self.width[m]>=(k+0.5)*step_value-step_value*0.2 and self.width[m]<=(k+0.5)*step_value+step_value*0.2:
+    #                 dis_av_pt.append(self.distance_delta[m])
+    #         if dis_av_pt:
+    #             self.cal_distance_set_init.append(float(numpy.mean(dis_av_pt)))
+    #         else:
+    #             self.cal_distance_set_init.append(0)
 
         #print "cal_distance_set_init = ",self.cal_distance_set_init
         #print "config before =", self.cal_width_set_init, "s ", self.cal_width_set_init[1]
-        self.PT_Slider1.setValue(self.cal_width_set_init[0]*self.scale_width)
-        self.PT_Slider2.setValue(self.cal_width_set_init[1]*self.scale_width)
-        self.PT_Slider3.setValue(self.cal_width_set_init[2]*self.scale_width)
-        self.PT_Slider4.setValue(self.cal_width_set_init[3]*self.scale_width)
-        self.PT_Slider5.setValue(self.cal_width_set_init[4]*self.scale_width)
-        self.PT_Slider6.setValue(self.cal_width_set_init[5]*self.scale_width)
-        self.PT_Slider7.setValue(self.cal_width_set_init[6]*self.scale_width)
-        self.PT_Slider8.setValue(self.cal_width_set_init[7]*self.scale_width)
-        self.PT_Slider9.setValue(self.cal_width_set_init[8]*self.scale_width)
-        self.PT_Slider10.setValue(self.cal_width_set_init[9]*self.scale_width)
+        # self.PT_Slider1.setValue(self.cal_width_set_init[0]*self.scale_width)
+        # self.PT_Slider2.setValue(self.cal_width_set_init[1]*self.scale_width)
+        # self.PT_Slider3.setValue(self.cal_width_set_init[2]*self.scale_width)
+        # self.PT_Slider4.setValue(self.cal_width_set_init[3]*self.scale_width)
+        # self.PT_Slider5.setValue(self.cal_width_set_init[4]*self.scale_width)
+        # self.PT_Slider6.setValue(self.cal_width_set_init[5]*self.scale_width)
+        # self.PT_Slider7.setValue(self.cal_width_set_init[6]*self.scale_width)
+        # self.PT_Slider8.setValue(self.cal_width_set_init[7]*self.scale_width)
+        # self.PT_Slider9.setValue(self.cal_width_set_init[8]*self.scale_width)
+        # self.PT_Slider10.setValue(self.cal_width_set_init[9]*self.scale_width)
 
-        self.PT_Slider_distance_1.setValue(self.cal_distance_set_init[0]*self.scale_distance)
-        self.PT_Slider_distance_2.setValue(self.cal_distance_set_init[1]*self.scale_distance)
-        self.PT_Slider_distance_3.setValue(self.cal_distance_set_init[2]*self.scale_distance)
-        self.PT_Slider_distance_4.setValue(self.cal_distance_set_init[3]*self.scale_distance)
-        self.PT_Slider_distance_5.setValue(self.cal_distance_set_init[4]*self.scale_distance)
-        self.PT_Slider_distance_6.setValue(self.cal_distance_set_init[5]*self.scale_distance)
-        self.PT_Slider_distance_7.setValue(self.cal_distance_set_init[6]*self.scale_distance)
-        self.PT_Slider_distance_8.setValue(self.cal_distance_set_init[7]*self.scale_distance)
-        self.PT_Slider_distance_9.setValue(self.cal_distance_set_init[8]*self.scale_distance)
-        self.PT_Slider_distance_10.setValue(self.cal_distance_set_init[9]*self.scale_distance)
+        # self.PT_Slider_distance_1.setValue(self.cal_distance_set_init[0]*self.scale_distance)
+        # self.PT_Slider_distance_2.setValue(self.cal_distance_set_init[1]*self.scale_distance)
+        # self.PT_Slider_distance_3.setValue(self.cal_distance_set_init[2]*self.scale_distance)
+        # self.PT_Slider_distance_4.setValue(self.cal_distance_set_init[3]*self.scale_distance)
+        # self.PT_Slider_distance_5.setValue(self.cal_distance_set_init[4]*self.scale_distance)
+        # self.PT_Slider_distance_6.setValue(self.cal_distance_set_init[5]*self.scale_distance)
+        # self.PT_Slider_distance_7.setValue(self.cal_distance_set_init[6]*self.scale_distance)
+        # self.PT_Slider_distance_8.setValue(self.cal_distance_set_init[7]*self.scale_distance)
+        # self.PT_Slider_distance_9.setValue(self.cal_distance_set_init[8]*self.scale_distance)
+        # self.PT_Slider_distance_10.setValue(self.cal_distance_set_init[9]*self.scale_distance)
         
         #print "============", self.cal_width_set_init,"==============", self.cal_distance_set_init
         #print self.PT_Slider1.value()," ", self.PT_Slider2.value()
-    def botton_value_set(self):
-        #print "cal_distance_set_init = ",self.cal_distance_set_init
+    # def botton_value_set(self):
+    #     #print "cal_distance_set_init = ",self.cal_distance_set_init
         
-        #print "config before =", self.cal_width_set_init, "s ", self.cal_width_set_init[1]
-        self.PT_Slider1.setValue(self.cal_width_set_1[0]*self.scale_width)
-        self.PT_Slider2.setValue(self.cal_width_set_1[1]*self.scale_width)
-        self.PT_Slider3.setValue(self.cal_width_set_1[2]*self.scale_width)
-        self.PT_Slider4.setValue(self.cal_width_set_1[3]*self.scale_width)
-        self.PT_Slider5.setValue(self.cal_width_set_1[4]*self.scale_width)
-        self.PT_Slider6.setValue(self.cal_width_set_1[5]*self.scale_width)
-        self.PT_Slider7.setValue(self.cal_width_set_1[6]*self.scale_width)
-        self.PT_Slider8.setValue(self.cal_width_set_1[7]*self.scale_width)
-        self.PT_Slider9.setValue(self.cal_width_set_1[8]*self.scale_width)
-        self.PT_Slider10.setValue(self.cal_width_set_1[9]*self.scale_width)
+    #     #print "config before =", self.cal_width_set_init, "s ", self.cal_width_set_init[1]
+    #     self.PT_Slider1.setValue(self.cal_width_set_1[0]*self.scale_width)
+    #     self.PT_Slider2.setValue(self.cal_width_set_1[1]*self.scale_width)
+    #     self.PT_Slider3.setValue(self.cal_width_set_1[2]*self.scale_width)
+    #     self.PT_Slider4.setValue(self.cal_width_set_1[3]*self.scale_width)
+    #     self.PT_Slider5.setValue(self.cal_width_set_1[4]*self.scale_width)
+    #     self.PT_Slider6.setValue(self.cal_width_set_1[5]*self.scale_width)
+    #     self.PT_Slider7.setValue(self.cal_width_set_1[6]*self.scale_width)
+    #     self.PT_Slider8.setValue(self.cal_width_set_1[7]*self.scale_width)
+    #     self.PT_Slider9.setValue(self.cal_width_set_1[8]*self.scale_width)
+    #     self.PT_Slider10.setValue(self.cal_width_set_1[9]*self.scale_width)
 
-        self.PT_Slider_distance_1.setValue(self.cal_distance_set_1[0]*self.scale_distance)
-        self.PT_Slider_distance_2.setValue(self.cal_distance_set_1[1]*self.scale_distance)
-        self.PT_Slider_distance_3.setValue(self.cal_distance_set_1[2]*self.scale_distance)
-        self.PT_Slider_distance_4.setValue(self.cal_distance_set_1[3]*self.scale_distance)
-        self.PT_Slider_distance_5.setValue(self.cal_distance_set_1[4]*self.scale_distance)
-        self.PT_Slider_distance_6.setValue(self.cal_distance_set_1[5]*self.scale_distance)
-        self.PT_Slider_distance_7.setValue(self.cal_distance_set_1[6]*self.scale_distance)
-        self.PT_Slider_distance_8.setValue(self.cal_distance_set_1[7]*self.scale_distance)
-        self.PT_Slider_distance_9.setValue(self.cal_distance_set_1[8]*self.scale_distance)
-        self.PT_Slider_distance_10.setValue(self.cal_distance_set_1[9]*self.scale_distance)
+    #     self.PT_Slider_distance_1.setValue(self.cal_distance_set_1[0]*self.scale_distance)
+    #     self.PT_Slider_distance_2.setValue(self.cal_distance_set_1[1]*self.scale_distance)
+    #     self.PT_Slider_distance_3.setValue(self.cal_distance_set_1[2]*self.scale_distance)
+    #     self.PT_Slider_distance_4.setValue(self.cal_distance_set_1[3]*self.scale_distance)
+    #     self.PT_Slider_distance_5.setValue(self.cal_distance_set_1[4]*self.scale_distance)
+    #     self.PT_Slider_distance_6.setValue(self.cal_distance_set_1[5]*self.scale_distance)
+    #     self.PT_Slider_distance_7.setValue(self.cal_distance_set_1[6]*self.scale_distance)
+    #     self.PT_Slider_distance_8.setValue(self.cal_distance_set_1[7]*self.scale_distance)
+    #     self.PT_Slider_distance_9.setValue(self.cal_distance_set_1[8]*self.scale_distance)
+    #     self.PT_Slider_distance_10.setValue(self.cal_distance_set_1[9]*self.scale_distance)
         #print "============", self.cal_width_set_init,"==============", self.cal_distance_set_init
         #print self.PT_Slider1.value()," ", self.PT_Slider2.value()
     
-    def sliderFunc_w1(self):
-        self.cal_width_set[0] = self.PT_Slider1.value()/self.scale_width
-        self.plt_animation()
-    def sliderFunc_w2(self):
-        self.cal_width_set[1] = self.PT_Slider2.value()/self.scale_width
-        self.plt_animation()
-    def sliderFunc_w3(self):
-        self.cal_width_set[2] = self.PT_Slider3.value()/self.scale_width
-        self.plt_animation()
-    def sliderFunc_w4(self):
-        self.cal_width_set[3] = self.PT_Slider4.value()/self.scale_width
-        self.plt_animation()
-    def sliderFunc_w5(self):
-        self.cal_width_set[4] = self.PT_Slider5.value()/self.scale_width
-        self.plt_animation()
-    def sliderFunc_w6(self):
-        self.cal_width_set[5] = self.PT_Slider6.value()/self.scale_width
-        self.plt_animation()
-    def sliderFunc_w7(self):
-        self.cal_width_set[6] = self.PT_Slider7.value()/self.scale_width
-        self.plt_animation()
-    def sliderFunc_w8(self):
-        self.cal_width_set[7] = self.PT_Slider8.value()/self.scale_width
-        self.plt_animation()
-    def sliderFunc_w9(self):
-        self.cal_width_set[8] = self.PT_Slider9.value()/self.scale_width
-        self.plt_animation()
-    def sliderFunc_w10(self):
-        self.cal_width_set[9] = self.PT_Slider10.value()/self.scale_width
-        self.plt_animation()
+    # def sliderFunc_w1(self):
+    #     self.cal_width_set[0] = self.PT_Slider1.value()/self.scale_width
+    #     self.plt_animation()
+    # def sliderFunc_w2(self):
+    #     self.cal_width_set[1] = self.PT_Slider2.value()/self.scale_width
+    #     self.plt_animation()
+    # def sliderFunc_w3(self):
+    #     self.cal_width_set[2] = self.PT_Slider3.value()/self.scale_width
+    #     self.plt_animation()
+    # def sliderFunc_w4(self):
+    #     self.cal_width_set[3] = self.PT_Slider4.value()/self.scale_width
+    #     self.plt_animation()
+    # def sliderFunc_w5(self):
+    #     self.cal_width_set[4] = self.PT_Slider5.value()/self.scale_width
+    #     self.plt_animation()
+    # def sliderFunc_w6(self):
+    #     self.cal_width_set[5] = self.PT_Slider6.value()/self.scale_width
+    #     self.plt_animation()
+    # def sliderFunc_w7(self):
+    #     self.cal_width_set[6] = self.PT_Slider7.value()/self.scale_width
+    #     self.plt_animation()
+    # def sliderFunc_w8(self):
+    #     self.cal_width_set[7] = self.PT_Slider8.value()/self.scale_width
+    #     self.plt_animation()
+    # def sliderFunc_w9(self):
+    #     self.cal_width_set[8] = self.PT_Slider9.value()/self.scale_width
+    #     self.plt_animation()
+    # def sliderFunc_w10(self):
+    #     self.cal_width_set[9] = self.PT_Slider10.value()/self.scale_width
+    #     self.plt_animation()
 
-    def sliderFunc_d1(self):
-        self.cal_distance_set[0] = self.PT_Slider_distance_1.value()/self.scale_distance
-        self.plt_animation()
-    def sliderFunc_d2(self):
-        self.cal_distance_set[1] = self.PT_Slider_distance_2.value()/self.scale_distance
-        self.plt_animation()
-    def sliderFunc_d3(self):
-        self.cal_distance_set[2] = self.PT_Slider_distance_3.value()/self.scale_distance
-        self.plt_animation()
-    def sliderFunc_d4(self):
-        self.cal_distance_set[3] = self.PT_Slider_distance_4.value()/self.scale_distance
-        self.plt_animation()
-    def sliderFunc_d5(self):
-        self.cal_distance_set[4] = self.PT_Slider_distance_5.value()/self.scale_distance
-        self.plt_animation()
-    def sliderFunc_d6(self):
-        self.cal_distance_set[5] = self.PT_Slider_distance_6.value()/self.scale_distance
-        self.plt_animation()
-    def sliderFunc_d7(self):
-        self.cal_distance_set[6] = self.PT_Slider_distance_7.value()/self.scale_distance
-        self.plt_animation()
-    def sliderFunc_d8(self):
-        self.cal_distance_set[7] = self.PT_Slider_distance_8.value()/self.scale_distance
-        self.plt_animation()
-    def sliderFunc_d9(self):
-        self.cal_distance_set[8] = self.PT_Slider_distance_9.value()/self.scale_distance
-        self.plt_animation()
-    def sliderFunc_d10(self):
-        self.cal_distance_set[9] = self.PT_Slider_distance_10.value()/self.scale_distance
-        self.plt_animation()
+    # def sliderFunc_d1(self):
+    #     self.cal_distance_set[0] = self.PT_Slider_distance_1.value()/self.scale_distance
+    #     self.plt_animation()
+    # def sliderFunc_d2(self):
+    #     self.cal_distance_set[1] = self.PT_Slider_distance_2.value()/self.scale_distance
+    #     self.plt_animation()
+    # def sliderFunc_d3(self):
+    #     self.cal_distance_set[2] = self.PT_Slider_distance_3.value()/self.scale_distance
+    #     self.plt_animation()
+    # def sliderFunc_d4(self):
+    #     self.cal_distance_set[3] = self.PT_Slider_distance_4.value()/self.scale_distance
+    #     self.plt_animation()
+    # def sliderFunc_d5(self):
+    #     self.cal_distance_set[4] = self.PT_Slider_distance_5.value()/self.scale_distance
+    #     self.plt_animation()
+    # def sliderFunc_d6(self):
+    #     self.cal_distance_set[5] = self.PT_Slider_distance_6.value()/self.scale_distance
+    #     self.plt_animation()
+    # def sliderFunc_d7(self):
+    #     self.cal_distance_set[6] = self.PT_Slider_distance_7.value()/self.scale_distance
+    #     self.plt_animation()
+    # def sliderFunc_d8(self):
+    #     self.cal_distance_set[7] = self.PT_Slider_distance_8.value()/self.scale_distance
+    #     self.plt_animation()
+    # def sliderFunc_d9(self):
+    #     self.cal_distance_set[8] = self.PT_Slider_distance_9.value()/self.scale_distance
+    #     self.plt_animation()
+    # def sliderFunc_d10(self):
+    #     self.cal_distance_set[9] = self.PT_Slider_distance_10.value()/self.scale_distance
+    #     self.plt_animation()
     ######## botton setting end
-    def calculation_showData_gen(self):
-        step = 10
-        self.cal_distance = self.cal_distance_set
-        self.cal_width=self.cal_width_set
-        
-        self.distance_show = []
-        self.width_show = self.width
-        x=self.cal_width
-        y=self.cal_distance
-        #print "llll = ", x,"\n\n", y, "\n\n"
-        for h in range(len(self.width_show)):
-            if self.width_show[h] < self.cal_width[0]:
-                distance_show_temp = float((y[1]-y[0])*(self.width_show[h]-x[0]))/float(x[1]-x[0])+float(y[0])
-            elif self.width_show[h] >=self.cal_width[len(self.cal_width)-1]:
-                distance_show_temp = float((y[step-1]-y[step-2])*(self.width_show[h]-x[step-1]))/float(x[step-1]-x[step-2])+float(y[step-1])
-            else:
-                for s in range(len(self.cal_width)-1):
-                    if self.width_show[h] >=self.cal_width[s] and self.width_show[h] < self.cal_width[s+1]:
-                        distance_show_temp = float((y[s+1]-y[s])*(self.width_show[h]-x[s]))/float(x[s+1]-x[s])+float(y[s])
-                if not distance_show_temp:
-                    distance_show_temp = 0
-                    #print "wrong data"
-            self.distance_show.append(distance_show_temp-self.distance_delta[h]+self.distance_real)
-        return self.width_show, self.distance_show
+    
         
     def clearAndCloseFunc(self):
         self.width_udp, self.distance_udp = [], []
@@ -1023,9 +1007,9 @@ class Ui_LiDAR_Calibration(object):
         # waveShowHandle.waveAnimation()
 
         fig1 = matplotlib.pyplot.figure(1,figsize=(18,4))
-        ax = matplotlib.pyplot.subplot(111,xlim=(0, 15), ylim=(0,255))
+        ax = matplotlib.pyplot.subplot(111,xlim=(0, 400), ylim=(0,255))
         line, = ax.plot([],[],'bo--',lw=2)
-        line1, = ax.plot([0,120],[150,150],'ro--',lw=1)
+        line1, = ax.plot([0,120],[120,120],'ro--',lw=1)
         matplotlib.pyplot.title("channel %d"%int(channel_sel))
         matplotlib.pyplot.xlabel("time /(ns*0.15)=m")
         matplotlib.pyplot.ylabel("ADC signal /bit")
@@ -1049,12 +1033,9 @@ class Ui_LiDAR_Calibration(object):
         #     if num == 100000:
         #         breakout = 0
 
-
     def waveAlgorithm_width_distance_catch_func(self):
         points_num=1
         #self.channel_opt = 0
-        
-        
         width_list =[]
         distance_list=[]
         channel_sel = self.wave_channel_sel()
@@ -1083,8 +1064,8 @@ class Ui_LiDAR_Calibration(object):
             #matplotlib.pyplot.plot(pSignal[1],pSignal[0],'o-')
         except:
             print "algorithm failed !!!"
-        self.ret2.stop()
-        self.ret2.join()
+        # self.ret2.stop()
+        # self.ret2.join()
         #print type(distance_list)
         #print width_list, distance_list
         self.pulseWidth.setText("%f m"%round(width_list[0],4))
@@ -1092,24 +1073,51 @@ class Ui_LiDAR_Calibration(object):
         return width_list, distance_list
     
     def udpRowData_width_distance_catch_func(self):
-        points_num=5000
+        points_num=3500
         self.channel_opt = 0
         channel_sel = self.wave_channel_sel()
         
         datahandle = distannce_parse()
         width_list, distance_list = [], []
-
+        cnt = 0
         for i in range(points_num):
             #time.sleep(0.01)
+            cnt += 1
+            self.dataCatchingprogress.setValue(int(cnt/35.0))
             width_temp, distance_temp = [], []
             width_temp, distance_temp = datahandle.wave_data_catch(channel_sel)
-            if width_temp and distance_temp <= 30.0:
+            if width_temp and 0.5 < distance_temp <= 30.0:
                 width_list.append(width_temp)
                 distance_list.append(distance_temp)
+
         return width_list, distance_list
+        
+    # def serial_oneline(self):
+    #     points_num=100
+    #     self.channel_opt = 0
+    #     channel_sel = self.wave_channel_sel()
+        
+    #     datahandle = oneline.cloundShow()
+    #     width_list, distance_list = [], []
+    #     cnt = 0
+    #     print "right here"
+    #     for i in range(points_num):
+    #         #time.sleep(0.01)
+    #         cnt += 1
+    #         # self.dataCatchingprogress.setValue(int(cnt/35.0))
+    #         width_temp, distance_temp = [], []
+    #         width_temp, distance_temp = datahandle.wave_data_catch()
+    #         if width_temp and 0.5 < distance_temp <= 30.0:
+    #             width_list.append(width_temp)
+    #             distance_list.append(distance_temp)
+
+    #     return width_list, distance_list
+
     def width_distance_udp_sum(self):
         #temp_width,temp_distance = self.waveAlgorithm_width_distance_catch_func()
         temp_width,temp_distance = self.udpRowData_width_distance_catch_func()
+        # temp_width,temp_distance = self.serial_oneline()
+
         self.width_udp += temp_width
         self.distance_udp += temp_distance
         print "data_lenth =", len(self.width_udp), " ", len(self.distance_udp )
@@ -1119,7 +1127,7 @@ class Ui_LiDAR_Calibration(object):
         width,distance_delta = self.width_udp, self.distance_udp
         width_max = max(width)
         width_min = min(width)
-        step = 10
+        step = 10.0
         step_value = (width_max - width_min)/step
 
         cal_distance = []
@@ -1141,58 +1149,26 @@ class Ui_LiDAR_Calibration(object):
         #print "len of calwidth =", len(cal_width)," step_value =", step_value,"len(cal_dis) =", len(cal_distance)
         
         self.width,self.distance_delta,self.cal_width,self.cal_distance = width,distance_delta,cal_width,cal_distance
-        # self.cal_width_set_init , self.cal_distance_set_init= cal_width, cal_distance
-        self.cal_width_set_1 , self.cal_distance_set_1= cal_width, cal_distance
-        self.botton_value_set()
-        print self.width[0:50],"\n\n",self.distance_delta[0:50]#,"\n\n",self.cal_width,"\n\n",self.cal_distance,"\n\n",self.width_show,"\n\n",self.distance_show,"\n","\n",
+        # self.cal_width_set_1 , self.cal_distance_set_1= cal_width, cal_distance
+        # self.botton_value_set()
+        # print self.width[0:50],"\n\n",self.distance_delta[0:50]#,"\n\n",self.cal_width,"\n\n",self.cal_distance,"\n\n",self.width_show,"\n\n",self.distance_show,"\n","\n",
         self.cal_width_set, self.cal_distance_set = self.cal_width,  self.cal_distance
         
         self.plt_animation()
         self.ret.stop()
         self.ret.join()
         #self.rdData_calcu_data_gen()
-        return width,distance_delta,cal_width,cal_distance#,width_show,distance_show
-
-    def simu_data_gen(self):
-        width, distance_delta = [], []
-        for i in range(100):
-            rd_w = random.random()*5+i/20
-            width.append(rd_w)
-        for j in range(100):
-            rd_d = random.random()*0.2+self.width[j]/5
-            distance_delta.append(rd_d)
-        return 
-    def rdData_calcu_data_gen(self): #input self.width and self.distance_delta
-        self.width, self.distance_delta = self.simuGen_csvRead()
-        width_max = max(self.width)
-        width_min = min(self.width)
+        return width,distance_delta,cal_width,cal_distance
+    def showData_gen(self):
         step = 10
-        step_value = (width_max - width_min)/step
-        # print self.width
-        self.cal_distance = []
-        # self.cal_width=[]
-        # for r in range(step):
-        #     self.cal_width.append(r*step_value+0.5*step_value)
-        cof = [0.3, 0.8, 1.5, 2.5, 3.5, 5, 6.5, 8, 9.5, 11]
-        self.cal_width=[step_value*arr+width_min for arr in cof]
-        for k in range(step):
-            dis_av_pt = []
-            for m in range(len(self.width)):
-                #if self.width[m]>=(k+0.5)*step_value-step_value*0.2 and self.width[m]<=(k+0.5)*step_value+step_value*0.2:
-                if self.width[m]>=(k+0.5)*step_value-step_value*0.2 and self.width[m]<=(k+0.5)*step_value+step_value*0.2:
-                    dis_av_pt.append(self.distance_delta[m])
-            if dis_av_pt:
-                self.cal_distance.append(numpy.mean(dis_av_pt))
-            else:
-                self.cal_distance.append(0)
-        #print "len of calwidth =", len(self.cal_width)," step_value =", step_value,"len(cal_dis) =", len(self.cal_distance)
-
+        self.cal_distance = self.cal_distance_set
+        self.cal_width=self.cal_width_set
+        
         self.distance_show = []
         self.width_show = self.width
-
         x=self.cal_width
         y=self.cal_distance
-        # print "x = ", x, "\n y =", y
+        #print "llll = ", x,"\n\n", y, "\n\n"
         for h in range(len(self.width_show)):
             if self.width_show[h] < self.cal_width[0]:
                 distance_show_temp = float((y[1]-y[0])*(self.width_show[h]-x[0]))/float(x[1]-x[0])+float(y[0])
@@ -1206,12 +1182,44 @@ class Ui_LiDAR_Calibration(object):
                     distance_show_temp = 0
                     #print "wrong data"
             self.distance_show.append(distance_show_temp-self.distance_delta[h]+self.distance_real)
+        return self.width_show, self.distance_show
+    def rdData_calcu_data_gen(self):
+        self.width, self.distance_delta = self.simuGen_csvRead()
+        width_max = max(self.width)
+        width_min = min(self.width)
+        step = 10
+        step_value = (width_max - width_min)/step
+        self.cal_distance = []
+        cof = [0.3, 0.8, 1.5, 2.5, 3.5, 5, 6.5, 8, 9.5, 11]
+        self.cal_width=[step_value*arr+width_min for arr in cof]
+        for k in range(step):
+            dis_av_pt = []
+            for m in range(len(self.width)):
+                if self.width[m]>=(k+0.5)*step_value-step_value*0.2 and self.width[m]<=(k+0.5)*step_value+step_value*0.2:
+                    dis_av_pt.append(self.distance_delta[m])
+            if dis_av_pt:
+                self.cal_distance.append(numpy.mean(dis_av_pt))
+            else:
+                self.cal_distance.append(0)
+        #print "len of calwidth =", len(self.cal_width)," step_value =", step_value,"len(cal_dis) =", len(self.cal_distance)
 
-        self.cal_width_set = self.cal_width
-        self.cal_distance_set = self.cal_distance
-
+        self.distance_show,self.width_show = [], self.width
+        x=self.cal_width
+        y=self.cal_distance
+        for h in range(len(self.width_show)):
+            if self.width_show[h] < self.cal_width[0]:
+                distance_show_temp = float((y[1]-y[0])*(self.width_show[h]-x[0]))/float(x[1]-x[0])+float(y[0])
+            elif self.width_show[h] >=self.cal_width[len(self.cal_width)-1]:
+                distance_show_temp = float((y[step-1]-y[step-2])*(self.width_show[h]-x[step-1]))/float(x[step-1]-x[step-2])+float(y[step-1])
+            else:
+                for s in range(len(self.cal_width)-1):
+                    if self.width_show[h] >=self.cal_width[s] and self.width_show[h] < self.cal_width[s+1]:
+                        distance_show_temp = float((y[s+1]-y[s])*(self.width_show[h]-x[s]))/float(x[s+1]-x[s])+float(y[s])
+                if not distance_show_temp:
+                    distance_show_temp = 0
+                    #print "wrong data"
+            self.distance_show.append(distance_show_temp-self.distance_delta[h]+self.distance_real)
         return self.cal_width, self.cal_distance, self.width_show, self.distance_show,
-        #print "len(self.distance_show =",len(self.distance_show)
     def plot_setup(self):
         self.Fig1 = matplotlib.pyplot.Figure(figsize=(12,10))#matplotlib.pyplot.Figure(figsize=(8,8))
         self.ax1 =  self.Fig1.add_subplot(211,xlim=(0, 8),\
@@ -1242,7 +1250,7 @@ class Ui_LiDAR_Calibration(object):
         self.canvas1.setParent(self.pyplotWidget)
     def plt_animation(self):
 
-        self.calculation_showData_gen()
+        self.showData_gen()
         self.ax1.set_title('channle %s -- Ditance-Width_Calibration'%self.channel_opt)
         self.ax1.set_xlim(left=0,right=10)
         self.ax1.set_ylim(bottom=max(self.distance_delta)-1.0, top=max(self.distance_delta)+0.1)
@@ -1357,24 +1365,24 @@ class Ui_LiDAR_Calibration(object):
         self.label1_5.setText(_translate("LiDAR_Calibration", "Pt5"))
         self.label1_4.setText(_translate("LiDAR_Calibration", "Pt4"))
         self.channel4.setText(_translate("LiDAR_Calibration", "channel4"))
+        self.channel6.setText(_translate("LiDAR_Calibration", "channel6"))
         self.label1_7.setText(_translate("LiDAR_Calibration", "Pt7"))
         self.label1_2.setText(_translate("LiDAR_Calibration", "Pt2"))
         self.label1_3.setText(_translate("LiDAR_Calibration", "Pt3"))
         self.label1_8.setText(_translate("LiDAR_Calibration", "Pt8"))
-        self.calibration_out.setText(_translate("LiDAR_Calibration", "calibration_file_output"))
-        self.clearAndClose.setText(_translate("LiDAR_Calibration", "clear / close"))
-        self.reportGenerating.setText(_translate("LiDAR_Calibration", "reportGenerating"))
+        self.reportGenerating.setText(_translate("LiDAR_Calibration", "  reportGen"))
         self.channel5.setText(_translate("LiDAR_Calibration", "channel5"))
-        self.channel6.setText(_translate("LiDAR_Calibration", "channel6"))
         self.channel1.setText(_translate("LiDAR_Calibration", "channel1"))
-        self.catchWave.setText(_translate("LiDAR_Calibration", "catchingWave"))
         self.channel3.setText(_translate("LiDAR_Calibration", "channel3"))
         self.channel0.setText(_translate("LiDAR_Calibration", "channel0"))
         self.channel2.setText(_translate("LiDAR_Calibration", "channel2"))
-        self.saveOriginUdpData.setText(_translate("LiDAR_Calibration", "saveOriginUdpData"))
+        self.saveOriginUdpData.setText(_translate("LiDAR_Calibration", "saveOriginData"))
         self.channel7.setText(_translate("LiDAR_Calibration", "channel7"))
-        self.pulseWidthDistance.setText(_translate("LiDAR_Calibration", "PulseShow"))
-        self.waveShow.setText(_translate("LiDAR_Calibration", "waveShow"))
+        self.waveShow.setText(_translate("LiDAR_Calibration", "  waveShow"))
+        self.calibration_out.setText(_translate("LiDAR_Calibration", "    calibration_file_output"))
+        self.pulseWidthDistance.setText(_translate("LiDAR_Calibration", "  PulseShow"))
+        self.catchWave.setText(_translate("LiDAR_Calibration", " catchingWave"))
+        self.clearAndClose.setText(_translate("LiDAR_Calibration", "    clear / close"))
         self.rmse_message.setHtml(_translate("LiDAR_Calibration", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
 "<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
 "p, li { white-space: pre-wrap; }\n"

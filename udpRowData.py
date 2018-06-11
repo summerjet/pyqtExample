@@ -228,7 +228,7 @@ if __name__ == '__main__':
         datahandle = distannce_parse()
         width_list, distance_list = [], []
 
-        for i in range(10000):
+        for i in range(128*100):
             width_temp, distance_temp = [], []
             width_temp, distance_temp = datahandle.wave_data_catch(channel_opt)
             if distance_temp:
@@ -248,6 +248,7 @@ if __name__ == '__main__':
         # print width_list, "len(width_list) =", len(width_list)
         # print distance_list, "len(distance_list) =", len(distance_list)
         # print "width std =", np.std(width_list)," distance std =", np.std(distance_list)
+        # plt.plot(distance_list,'b.--')
         plt.plot(width_list,distance_list,'bo')
         plt.ylabel(" distance /m")
         plt.xlabel(" width_of_pulse /m")
